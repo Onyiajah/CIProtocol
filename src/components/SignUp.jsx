@@ -354,10 +354,10 @@ function SignUp() {
                   disabled={isConnecting}
                 >
                   <img
-                    src="/assets/images/walletconnect-logo.png"
-                    alt="WalletConnect"
-                    className="walletconnect-icon"
-                  />
+                      src="/assets/images/walletconnect-logo.png"
+                      alt="WalletConnect"
+                      className="walletconnect-icon"
+                    />
                   {isConnecting ? "Connecting..." : "Sign Up with WalletConnect"}
                 </button>
               </div>
