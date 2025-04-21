@@ -246,17 +246,17 @@ function ConnectWallet() {
   };
 
   const wallets = [
-    { name: "Backpack", icon: "/assets/images/backpack-logo.png" },
-    { name: "Exodus", icon: "/assets/images/exodus-logo.png" },
-    { name: "Fireblocks", icon: "/assets/images/fireblocks-logo.png" },
-    { name: "Jupiter", icon: "/assets/images/jupiter-logo.png" },
-    { name: "Phantom", icon: "/assets/images/phantom-logo.png" },
-    { name: "Coinbase", icon: "/assets/images/coinbase-wallet-logo.png" },
-    { name: "Bifrost", icon: "/assets/images/bifrost-logo.png" },
-    { name: "WEMIX", icon: "/assets/images/wemix-logo.png" },
-    { name: "Bitcoin", icon: "/assets/images/btc-logo.png" },
-    { name: "Solflare", icon: "/assets/images/solflare-logo.png" },
-    { name: "Blackfort", icon: "/assets/images/blackfort-logo.png" },
+    { name: "Backpack", icon: "/assets/backpack-logo.png" },
+    { name: "Exodus", icon: "/assets/exodus-logo.png" },
+    { name: "Fireblocks", icon: "/assets/fireblocks-logo.png" },
+    { name: "Jupiter", icon: "/assets/jupiter-logo.png" },
+    { name: "Phantom", icon: "/assets/phantom-logo.png" },
+    { name: "Coinbase", icon: "/assets/coinbase-wallet-logo.png" },
+    { name: "Bifrost", icon: "/assets/bifrost-logo.png" },
+    { name: "WEMIX", icon: "/assets/wemix-logo.png" },
+    { name: "Bitcoin", icon: "/assets/btc-logo.png" },
+    { name: "Solflare", icon: "/assets/solflare-logo.png" },
+    { name: "Blackfort", icon: "/assets/blackfort-logo.png" },
   ];
 
   const filteredWallets = wallets.filter((wallet) =>
@@ -274,8 +274,8 @@ function ConnectWallet() {
       </div>
       <div className="welcome-right">
         <div className="welcome-right-content">
-          <div className="logo">
-            <img src="/assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+         <div className="logo">
+            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="progress-indicator">
             <span className="progress-step active">1</span>
