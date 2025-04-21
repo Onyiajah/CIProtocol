@@ -354,7 +354,7 @@ function SignUp() {
                   disabled={isConnecting}
                 >
                   <img
-                      src="/assets/images/walletconnect-logo.png"
+                      src="/assets/walletconnect-logo.png"
                       alt="WalletConnect"
                       className="walletconnect-icon"
                     />
