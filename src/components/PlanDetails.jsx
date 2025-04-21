@@ -31,8 +31,8 @@ function PlanDetails() {
     return (
       <div className="dashboard-page">
         <div className="sidebar">
-          <div className="logo">
-            <img src="../assets/images/logo 1.png" alt="CIP Logo" className="logo-image" />
+         <div className="logo">
+            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="sidebar-nav">
             <button
