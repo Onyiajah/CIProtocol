@@ -222,7 +222,7 @@ function SignUp() {
       <div className="welcome-right">
         <div className="welcome-right-content">
           <div className="logo">
-            <img src="/assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="progress-indicator">
             <span className="progress-step active">1</span>
