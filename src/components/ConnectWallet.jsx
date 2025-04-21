@@ -3,6 +3,19 @@ import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import Assets from "./Assets";
 import "../index.css";
+import backpacklogo from "../../public/assets/images/backpack-logo.png";
+import exoduslogo from "../../public/assets/images/exodus-logo.png";
+import fireblockslogo from "../../public/assets/images/fireblocks-logo.png";
+import jupiterlogo from "../../public/assets/images/jupiter-logo.png";
+import phantomlogo from "../../public/assets/images/phantom-logo.png";
+import coinbasewalletlogo from "../../public/assets/images/coinbase-wallet-logo.png";
+import bifrostlogo from "../../public/assets/images/bifrost-logo.png";
+import wemixlogo from "../../public/assets/images/wemix-logo.png";
+import btclogo from "../../public/assets/images/btc-logo.png";
+import solflarelogo from "../../public/assets/images/solflare-logo.png";
+import blackfortlogo from "../../public/assets/images/blackfort-logo.png";
+
+
 
 // Enable wallet validation
 const ENABLE_WALLET_VALIDATION = true;
@@ -246,17 +259,17 @@ function ConnectWallet() {
   };
 
   const wallets = [
-    { name: "Backpack", icon: "/assets/images/backpack-logo.png" },
-    { name: "Exodus", icon: "/assets/images/exodus-logo.png" },
-    { name: "Fireblocks", icon: "/assets/images/fireblocks-logo.png" },
-    { name: "Jupiter", icon: "/assets/images/jupiter-logo.png" },
-    { name: "Phantom", icon: "/assets/images/phantom-logo.png" },
-    { name: "Coinbase", icon: "/assets/images/coinbase-wallet-logo.png" },
-    { name: "Bifrost", icon: "/assets/images/bifrost-logo.png" },
-    { name: "WEMIX", icon: "/assets/images/wemix-logo.png" },
-    { name: "Bitcoin", icon: "/assets/images/btc-logo.png" },
-    { name: "Solflare", icon: "/assets/images/solflare-logo.png" },
-    { name: "Blackfort", icon: "/assets/images/blackfort-logo.png" },
+    { name: "Backpack", icon: {backpacklogo}},
+    { name: "Exodus", icon: {exoduslogo}},
+    { name: "Fireblocks", icon: {fireblockslogo}},
+    { name: "Jupiter", icon: {jupiterlogo} },
+    { name: "Phantom", icon: {phantomlogo} },
+    { name: "Coinbase", icon: {coinbasewalletlogo} },
+    { name: "Bifrost", icon: {bifrostlogo} },
+    { name: "WEMIX", icon: {wemixlogo}},
+    { name: "Bitcoin", icon: {btclogo} },
+    { name: "Solflare", icon: {solflarelogo} },
+    { name: "Blackfort", icon: {blackfortlogo} },
   ];
 
   const filteredWallets = wallets.filter((wallet) =>
