@@ -4,6 +4,8 @@ import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import Web3 from "web3";
 import Assets from "./Assets";
 import "../index.css";
+import walletConnectLogo from "../../public/assets/images/walletconnect-logo.png";
+
 
 // Enable wallet validation during login
 const ENABLE_WALLET_VALIDATION = true;
@@ -271,7 +273,7 @@ function Login() {
                     disabled={isConnecting}
                   >
                     <img
-                      src="/assets/images/walletconnect-logo.png"
+                      src={walletConnectLogo}
                       alt="WalletConnect"
                       className="walletconnect-icon"
                     />
