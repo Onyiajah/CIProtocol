@@ -23,7 +23,7 @@ function Plans() {
           <span className="afolabi-text">Afolabi12345</span>
           <img
             src="/assets/profile.png"
-            alt="User Avatar"
+            alt="Profile"
             className="user-avatar"
           />
           <img
