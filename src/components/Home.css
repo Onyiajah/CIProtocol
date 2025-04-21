@@ -1,0 +1,823 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.home-root {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: #13171a;
+    color: #f9f9f9;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 20px 0 40px;
+    z-index: 10;
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    height: 60px;
+    width: auto;
+}
+
+.navbar {
+    display: flex;
+    gap: 15px;
+}
+
+/* Hamburger Button */
+.hamburger {
+    display: none;
+}
+
+/* Hero Section */
+.hero {
+    padding: 200px 0 120px;
+    text-align: left;
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+}
+
+.hero .container {
+    max-width: 650px;
+    margin-left: 0;
+    padding-left: 80px;
+    text-align: left;
+}
+
+.hero h1 {
+    font-size: 45px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.3;
+    color: #f9f9f9;
+}
+
+.hero .subtitle {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #f9f9f9;
+}
+
+.hero p {
+    font-size: 16px;
+    margin-bottom: 40px;
+    color: #d3d3d3;
+}
+
+.hero .btn {
+    margin-bottom: 20px;
+}
+
+/* Supported by COTI */
+.supported-by {
+    display: flex !important; /* Ensure visibility */
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+    text-align: left !important;
+    margin-top: 20px; /* Space above */
+}
+
+.supported-by span {
+    font-size: 14px;
+    color: #d3d3d3;
+}
+
+.coti-logo {
+    height: 24px;
+    width: auto;
+}
+
+/* Button */
+.btn {
+    display: inline-block;
+    background-color: #E67920;
+    color: #ffff;
+    padding: 12px 24px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background-color: #e77d25;
+}
+
+/* Catchphrase Section */
+.catchphrase {
+    padding: 80px 40px;
+    text-align: center;
+}
+
+.catchphrase .container {
+    margin-left: 0;
+    padding-left: 40px;
+    text-align: center;
+}
+
+.catchphrase p {
+    font-family: 'Arial', sans-serif;
+    font-size: 60px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Stats Section */
+.stats {
+    padding: 80px 0;
+    text-align: left;
+}
+
+.stats .container {
+    margin-left: 0;
+    padding-left: 80px;
+    text-align: left;
+}
+
+.stats h2,
+.stats p {
+    text-align: left;
+}
+
+/* Build Section */
+.build {
+    padding: 80px 0;
+}
+
+.build .container {
+    margin-left: 0;
+    padding-left: 80px;
+}
+
+.build .row {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.build .image {
+    flex: 1;
+    max-width: 1000px;
+}
+
+.build .image img {
+    max-width: 100%;
+    display: block;
+}
+
+.build .text {
+    flex: 1;
+    text-align: left;
+}
+
+.build .text h2 {
+    font-size: 28px;
+    font-weight: normal;
+    margin-bottom: 20px;
+    color: #f9f9f9;
+    white-space: nowrap;
+}
+
+.build .text p {
+    font-size: 16px;
+    color: #d3d3d3;
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 80px 0;
+}
+
+.how-it-works .container {
+    margin-left: 0;
+    padding-left: 80px;
+    text-align: left;
+}
+
+.how-it-works .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+}
+
+.how-it-works .left-column {
+    flex: 1;
+    text-align: left;
+}
+
+.how-it-works .left-column h2 {
+    font-size: 36px;
+    font-weight: bold;
+    color: #f9f9f9;
+    white-space: nowrap;
+}
+
+.how-it-works .right-column {
+    flex: 1;
+    text-align: left;
+}
+
+.how-it-works .right-column ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin-bottom: 30px;
+}
+
+.how-it-works .right-column li {
+    font-size: 16px;
+    color: #d3d3d3;
+    margin-bottom: 10px;
+}
+
+/* Uniqueness Section */
+.uniqueness {
+    padding: 80px 0;
+}
+
+.uniqueness .container {
+    text-align: center;
+}
+
+.uniqueness h2 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #f9f9f9;
+}
+
+.columns {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.column {
+    flex: 1;
+    min-width: 250px;
+    text-align: left;
+}
+
+.column h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f9f9f9;
+}
+
+.column p {
+    font-size: 16px;
+    color: #d3d3d3;
+}
+
+/* Footer */
+footer {
+    background-color: #07090b;
+    padding: 20px 0;
+    text-align: center;
+}
+
+footer p {
+    font-size: 14px;
+}
+
+/* Responsive Design Additions */
+
+/* Tablets (768px to 1024px) */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 15px;
+    }
+    header .container {
+        padding: 0 15px;
+    }
+    .logo {
+        height: 50px;
+    }
+    .navbar {
+        gap: 10px;
+    }
+    .btn {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    .hero {
+        padding: 150px 0 100px;
+        min-height: 500px;
+    }
+    .hero .container {
+        max-width: 550px;
+        padding-left: 40px;
+    }
+    .hero h1 {
+        font-size: 38px;
+    }
+    .hero .subtitle,
+    .hero p {
+        font-size: 14px;
+    }
+    .catchphrase {
+        padding: 60px 30px;
+    }
+    .catchphrase .container {
+        padding-left: 30px;
+    }
+    .catchphrase p {
+        font-size: 48px;
+    }
+    .stats {
+        padding: 60px 0;
+    }
+    .stats .container {
+        padding-left: 40px;
+    }
+    .build {
+        padding: 60px 0;
+    }
+    .build .container {
+        padding-left: 40px;
+    }
+    .build .row {
+        gap: 30px;
+    }
+    .build .image {
+        max-width: 600px;
+    }
+    .build .text h2 {
+        font-size: 24px;
+    }
+    .how-it-works {
+        padding: 60px 0;
+    }
+    .how-it-works .container {
+        padding-left: 40px;
+    }
+    .how-it-works .row {
+        gap: 30px;
+    }
+    .how-it-works .left-column h2 {
+        font-size: 32px;
+    }
+    .uniqueness {
+        padding: 60px 0;
+    }
+    .columns {
+        gap: 20px;
+    }
+    .column {
+        min-width: 200px;
+    }
+}
+
+/* Mobile Devices (Below 767px) */
+@media (max-width: 767px) {
+    .container {
+        padding: 0 10px;
+    }
+    header {
+        padding: 15px 0;
+    }
+    header .container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo {
+        height: 40px;
+    }
+    .hamburger {
+        display: block !important;
+        font-size: 20px;
+        background: none;
+        border: none;
+        color: #f9f9f9;
+        cursor: pointer;
+        padding: 5px 10px;
+        min-height: 36px;
+        line-height: 1;
+    }
+    .hamburger::before {
+        content: '≡';
+    }
+    .navbar {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        position: absolute;
+        top: 100%;
+        left: auto;
+        right: 10px;
+        max-width: 200px;
+        background-color: #13171a;
+        padding: 8px;
+        z-index: 10;
+    }
+    .navbar.active {
+        display: flex;
+    }
+    .navbar .btn {
+        padding: 8px 16px;
+        font-size: 11px;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        text-align: center;
+    }
+    .hero {
+        padding: 100px 0 80px;
+        min-height: 100vh;
+        text-align: left !important;
+        background-size: cover;
+        background-position: center;
+    }
+    .hero .container {
+        max-width: 100%;
+        padding: 0 20px;
+        text-align: left !important;
+    }
+    .hero h1,
+    .hero .subtitle,
+    .hero p,
+    .hero .btn,
+    .hero .supported-by {
+        text-align: left !important;
+    }
+    .hero h1 {
+        font-size: 32px;
+    }
+    .hero .subtitle,
+    .hero p {
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+    .catchphrase {
+        padding: 40px 0;
+        text-align: left !important;
+    }
+    .catchphrase .container {
+        padding: 0 20px;
+        text-align: left !important;
+    }
+    .catchphrase p {
+        font-size: 36px;
+        white-space: normal;
+        line-height: 1.2;
+        text-align: left !important;
+    }
+    .stats {
+        padding: 40px 0;
+        text-align: left !important;
+    }
+    .stats .container {
+        padding: 0 20px;
+        text-align: left !important;
+    }
+    .stats h2,
+    .stats p {
+        text-align: left !important;
+    }
+    .build {
+        padding: 40px 0;
+    }
+    .build .container {
+        padding: 0 20px;
+    }
+    .build .row {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .build .image {
+        max-width: 100%;
+        order: 2;
+    }
+    .build .text {
+        order: 1;
+        text-align: left !important;
+    }
+    .build .text h2,
+    .build .text p {
+        text-align: left !important;
+    }
+    .build .text h2 {
+        font-size: 22px;
+        white-space: normal;
+    }
+    .build .text p {
+        font-size: 14px;
+    }
+    .how-it-works {
+        padding: 40px 0;
+        text-align: left !important;
+    }
+    .how-it-works .container {
+        padding: 0 20px;
+        text-align: left !important;
+    }
+    .how-it-works .row {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .how-it-works .left-column {
+        text-align: left !important;
+    }
+    .how-it-works .left-column h2 {
+        font-size: 28px;
+        white-space: normal;
+        text-align: left !important;
+    }
+    .how-it-works .right-column {
+        text-align: left !important;
+    }
+    .how-it-works .right-column li {
+        font-size: 14px;
+    }
+    .uniqueness {
+        padding: 40px 0;
+    }
+    .uniqueness .container {
+        text-align: center;
+    }
+    .uniqueness h2 {
+        font-size: 28px;
+    }
+    .columns {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .column {
+        min-width: 100%;
+        text-align: left !important;
+    }
+    .column h3,
+    .column p {
+        text-align: left !important;
+    }
+    .column h3 {
+        font-size: 18px;
+    }
+    .column p {
+        font-size: 14px;
+    }
+    footer {
+        padding: 15px 0;
+    }
+    footer p {
+        font-size: 12px;
+    }
+}
+
+/* Very Small Screens (Below 479px) */
+@media (max-width: 479px) {
+    .container {
+        padding: 0 5px;
+    }
+    header {
+        padding: 10px 0;
+    }
+    .logo {
+        height: 35px;
+    }
+    .hamburger {
+        font-size: 18px;
+        padding: 4px 8px;
+        min-height: 32px;
+    }
+    .navbar {
+        gap: 6px;
+        padding: 6px;
+        max-width: 180px;
+        right: 5px;
+    }
+    .navbar .btn {
+        padding: 6px 12px;
+        font-size: 10px;
+        min-height: 32px;
+    }
+    .hero {
+        padding: 80px 0 60px;
+        min-height: 100vh;
+        background-size: cover;
+        background-position: center;
+    }
+    .hero .container {
+        padding: 0 15px;
+    }
+    .hero h1 {
+        font-size: 28px;
+    }
+    .hero .subtitle,
+    .hero p {
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+    .supported-by span {
+        font-size: 12px;
+    }
+    .coti-logo {
+        height: 20px;
+    }
+    .catchphrase {
+        padding: 30px 0;
+    }
+    .catchphrase .container {
+        padding: 0 15px;
+    }
+    .catchphrase p {
+        font-size: 28px;
+    }
+    .stats {
+        padding: 30px 0;
+    }
+    .stats .container {
+        padding: 0 15px;
+    }
+    .build .container {
+        padding: 0 15px;
+    }
+    .how-it-works .container {
+        padding: 0 15px;
+    }
+    .uniqueness h2 {
+        font-size: 24px;
+    }
+}
+
+/* Ultra-Small Screens (Below 360px) */
+@media (max-width: 360px) {
+    .container {
+        padding: 0 4px;
+    }
+    header {
+        padding: 8px 0;
+    }
+    .logo {
+        height: 30px;
+    }
+    .hamburger {
+        font-size: 16px;
+        padding: 3px 6px;
+        min-height: 30px;
+    }
+    .navbar {
+        gap: 5px;
+        padding: 5px;
+        max-width: 160px;
+        right: 4px;
+    }
+    .navbar .btn {
+        padding: 5px 10px;
+        font-size: 9px;
+        min-height: 30px;
+    }
+    .hero {
+        padding: 70px 0 50px;
+        min-height: 100vh;
+        background-size: cover;
+        background-position: center;
+    }
+    .hero .container {
+        padding: 0 10px;
+    }
+    .hero h1 {
+        font-size: 24px;
+    }
+    .hero .subtitle,
+    .hero p {
+        font-size: 11px;
+        margin-bottom: 15px;
+    }
+    .supported-by span {
+        font-size: 11px;
+    }
+    .coti-logo {
+        height: 18px;
+    }
+    .catchphrase {
+        padding: 20px 0;
+    }
+    .catchphrase .container {
+        padding: 0 10px;
+    }
+    .catchphrase p {
+        font-size: 24px;
+    }
+    .stats {
+        padding: 20px 0;
+    }
+    .stats .container {
+        padding: 0 10px;
+    }
+    .build {
+        padding: 20px 0;
+    }
+    .build .container {
+        padding: 0 10px;
+    }
+    .how-it-works {
+        padding: 20px 0;
+    }
+    .how-it-works .container {
+        padding: 0 10px;
+    }
+    .how-it-works .left-column h2 {
+        font-size: 22px;
+    }
+    .uniqueness {
+        padding: 20px 0;
+    }
+    .uniqueness h2 {
+        font-size: 22px;
+    }
+    footer {
+        padding: 10px 0;
+    }
+    footer p {
+        font-size: 11px;
+    }
+}
+
+/* Large Screens (Above 1920px) */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1400px;
+        padding: 0 30px;
+    }
+    .hero .container {
+        max-width: 800px;
+        padding-left: 100px;
+    }
+    .hero h1 {
+        font-size: 50px;
+    }
+    .hero .subtitle,
+    .hero p {
+        font-size: 18px;
+    }
+    .catchphrase p {
+        font-size: 70px;
+    }
+    .stats .container {
+        padding-left: 100px;
+    }
+    .build .container {
+        padding-left: 100px;
+    }
+    .build .image {
+        max-width: 1200px;
+    }
+    .build .text h2 {
+        font-size: 32px;
+    }
+    .how-it-works .container {
+        padding-left: 100px;
+    }
+    .how-it-works .left-column h2 {
+        font-size: 40px;
+    }
+    .uniqueness h2 {
+        font-size: 40px;
+    }
+    .column h3 {
+        font-size: 22px;
+    }
+    .column p {
+        font-size: 18px;
+    }
+    footer p {
+        font-size: 16px;
+    }
+}
+
+/* Ensure Viewport Height on Mobile */
+@media (max-width: 767px) {
+    .hero {
+        min-height: 100vh;
+    }
+}
