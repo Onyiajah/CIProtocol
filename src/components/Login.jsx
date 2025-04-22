@@ -6,7 +6,6 @@ import Assets from "./Assets";
 import "../index.css";
 import walletConnectLogo from "../../public/assets/images/walletconnect-logo.png";
 
-
 // Enable wallet validation during login
 const ENABLE_WALLET_VALIDATION = true;
 
@@ -37,7 +36,19 @@ function Login() {
     e.preventDefault();
     setFormError("");
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    // Add localStorage fallback for mobile (private browsing mode)
+    let storedUser;
+    try {
+      storedUser = JSON.parse(localStorage.getItem("user"));
+      if (!storedUser) {
+        // Fallback to sessionStorage if localStorage fails
+        storedUser = JSON.parse(sessionStorage.getItem("user"));
+      }
+    } catch (error) {
+      // If both localStorage and sessionStorage fail, use in-memory fallback
+      storedUser = window.tempStorage?.user ? JSON.parse(window.tempStorage.user) : null;
+    }
+
     if (!storedUser) {
       setFormError("No account found. Please sign up first.");
       return;
@@ -48,13 +59,13 @@ function Login() {
       return;
     }
 
-    // Validate wallet if already connected
-    if (ENABLE_WALLET_VALIDATION && walletData.address) {
+    // Skip wallet validation for email/password login
+    if (ENABLE_WALLET_VALIDATION && walletData.address && localStorage.getItem("walletType") === "WalletConnect") {
       const storedWalletAddress = localStorage.getItem("walletAddress");
       const storedWalletType = localStorage.getItem("walletType");
 
       if (storedWalletAddress && storedWalletType) {
-        const isSameWalletType = storedWalletType === "WalletConnect"; // Adjust if other wallet types are supported
+        const isSameWalletType = storedWalletType === "WalletConnect";
         const isSameAddress = walletData.address.toLowerCase() === storedWalletAddress.toLowerCase();
 
         if (!isSameWalletType || !isSameAddress) {
@@ -67,8 +78,19 @@ function Login() {
       }
     }
 
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("hasLoggedInBefore", "true");
+    // Save login state with fallback
+    try {
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("hasLoggedInBefore", "true");
+    } catch (error) {
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("hasLoggedInBefore", "true");
+      // In-memory fallback
+      if (!window.tempStorage) window.tempStorage = {};
+      window.tempStorage.isLoggedIn = "true";
+      window.tempStorage.hasLoggedInBefore = "true";
+    }
+
     navigate("/connect-wallet");
   };
 
@@ -118,7 +140,6 @@ function Login() {
         throw new Error("No wallet address found. Please sign up with WalletConnect first.");
       }
 
-      // Validate wallet against signup wallet
       if (ENABLE_WALLET_VALIDATION) {
         const isSameWalletType = storedWalletType === walletType;
         const isSameAddress = address.toLowerCase() === storedWalletAddress.toLowerCase();
@@ -136,7 +157,6 @@ function Login() {
         throw new Error("Invalid signature");
       }
 
-      // Store wallet type
       localStorage.setItem("walletAddress", address);
       localStorage.setItem("walletType", walletType);
       localStorage.setItem("isLoggedIn", "true");
