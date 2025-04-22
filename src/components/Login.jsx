@@ -6,9 +6,6 @@ import Assets from "./Assets";
 import "../index.css";
 import walletConnectLogo from "../../public/assets/images/walletconnect-logo.png";
 
-// Enable wallet validation during login
-const ENABLE_WALLET_VALIDATION = false; // Disabled for testing email/password login
-
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
@@ -34,39 +31,22 @@ function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("handleLogin triggered");
-    console.log("Form Data:", formData);
-
-    // Test localStorage
-    try {
-      localStorage.setItem("test", "test");
-      console.log("localStorage test:", localStorage.getItem("test"));
-    } catch (error) {
-      console.error("localStorage error:", error);
-      setFormError("Unable to access localStorage. Check browser settings.");
-      return;
-    }
-
     setFormError("");
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    console.log("Stored User:", storedUser);
-
     if (!storedUser) {
       setFormError("No account found. Please sign up first.");
-      console.log("Error: No account found");
       return;
     }
 
     if (storedUser.email !== formData.email || storedUser.password !== formData.password) {
       setFormError("Invalid email or password.");
-      console.log("Error: Invalid email or password");
       return;
     }
 
-    console.log("Login successful, navigating...");
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("hasLoggedInBefore", "true");
+
     navigate("/connect-wallet");
   };
 
@@ -74,21 +54,11 @@ function Login() {
     try {
       setIsConnecting(true);
 
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const wcProvider = await EthereumProvider.init({
         projectId: process.env.REACT_APP_WALLETCONNECT_PROJECT_ID,
         chains: [1],
-        optionalChains: [5, 11155111],
-        showQrModal: !isMobile,
+        showQrModal: true,
         methods: ["eth_requestAccounts", "eth_getBalance", "personal_sign"],
-        mobileLinks: ["metamask", "trust", "rainbow"],
-        desktopLinks: ["metamask", "trust"],
-        qrModalOptions: {
-          themeMode: "light",
-          themeVariables: {
-            "--wcm-z-index": "1000",
-          },
-        },
       });
 
       await wcProvider.connect();
@@ -103,14 +73,9 @@ function Login() {
         balance: balanceInEth,
       });
 
-      return { web3, address, wcProvider, walletType: "WalletConnect" };
+      return { web3, address, wcProvider };
     } catch (error) {
-      console.error("WalletConnect Error:", error);
-      if (error.message.includes("User rejected") || error.message.includes("Connection request reset")) {
-        setFormError("Wallet connection rejected. Please install a wallet app (e.g., MetaMask) and try again.");
-      } else {
-        setFormError(error.message || "Failed to connect to WalletConnect");
-      }
+      setFormError(error.message || "Failed to connect to WalletConnect");
       return false;
     } finally {
       setIsConnecting(false);
@@ -121,23 +86,12 @@ function Login() {
     const result = await connectToWalletConnect();
     if (!result) return;
 
-    const { web3, address, wcProvider, walletType } = result;
+    const { web3, address, wcProvider } = result;
 
     try {
       const storedWalletAddress = localStorage.getItem("walletAddress");
-      const storedWalletType = localStorage.getItem("walletType");
-
       if (!storedWalletAddress) {
         throw new Error("No wallet address found. Please sign up with WalletConnect first.");
-      }
-
-      if (ENABLE_WALLET_VALIDATION) {
-        const isSameWalletType = storedWalletType === walletType;
-        const isSameAddress = address.toLowerCase() === storedWalletAddress.toLowerCase();
-
-        if (!isSameWalletType || !isSameAddress) {
-          throw new Error("Wallet address or type does not match the registered wallet. Please use the same wallet you signed up with.");
-        }
       }
 
       const message = `Login to Crypto Inheritance Protocol at ${new Date().toISOString()}`;
@@ -148,8 +102,10 @@ function Login() {
         throw new Error("Invalid signature");
       }
 
-      localStorage.setItem("walletAddress", address);
-      localStorage.setItem("walletType", walletType);
+      if (address.toLowerCase() !== storedWalletAddress.toLowerCase()) {
+        throw new Error("Wallet address does not match the registered wallet. Please use the same wallet you signed up with.");
+      }
+
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("hasLoggedInBefore", "true");
       navigate("/plans");
@@ -157,7 +113,6 @@ function Login() {
       wcProvider.on("disconnect", () => {
         setWalletData({ address: null, balance: null });
         localStorage.removeItem("walletAddress");
-        localStorage.removeItem("walletType");
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("hasLoggedInBefore");
         navigate("/login");
@@ -214,8 +169,7 @@ function Login() {
                     placeholder="Enter Email address"
                     value={formData.email}
                     onChange={handleInputChange}
-                    autoComplete="email"
-                    autoCapitalize="off"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -228,8 +182,7 @@ function Login() {
                       placeholder="Enter Password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      autoComplete="current-password"
-                      autoCapitalize="off"
+                      required
                     />
                     <span
                       className="toggle-password"
@@ -262,15 +215,7 @@ function Login() {
                 </div>
                 {formError && <p className="form-error">{formError}</p>}
                 <div className="form-buttons">
-                  <button
-                    type="submit"
-                    className="get-started"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log("Button clicked");
-                      handleLogin(e);
-                    }}
-                  >
+                  <button type="submit" className="get-started">
                     Login
                   </button>
                 </div>
@@ -294,7 +239,7 @@ function Login() {
                     disabled={isConnecting}
                   >
                     <img
-                      src={walletConnectLogo}
+                      src="/assets/images/walletconnect-logo.png"
                       alt="WalletConnect"
                       className="walletconnect-icon"
                     />
