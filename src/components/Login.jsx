@@ -6,6 +6,9 @@ import Assets from "./Assets";
 import "../index.css";
 import walletConnectLogo from "../../public/assets/images/walletconnect-logo.png";
 
+// Enable wallet validation during login
+const ENABLE_WALLET_VALIDATION = true;
+
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
@@ -22,6 +25,7 @@ function Login() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Input changed: ${name} = ${value}`);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -31,23 +35,71 @@ function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    console.log("handleLogin triggered");
+    console.log("Form Data:", formData);
+
     setFormError("");
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
-      setFormError("No account found. Please sign up first.");
+    // Hardcoded email and password for login (bypassing localStorage)
+    const hardcodedEmail = "test@example.com";
+    const hardcodedPassword = "password123";
+
+    if (formData.email !== hardcodedEmail || formData.password !== hardcodedPassword) {
+      setFormError("Invalid email or password. Use test@example.com and password123.");
+      console.log("Error: Invalid email or password");
+      console.log("Expected Email:", hardcodedEmail, "Entered Email:", formData.email);
+      console.log("Expected Password:", hardcodedPassword, "Entered Password:", formData.password);
       return;
     }
 
-    if (storedUser.email !== formData.email || storedUser.password !== formData.password) {
-      setFormError("Invalid email or password.");
-      return;
+    // Validate wallet if already connected
+    if (ENABLE_WALLET_VALIDATION && walletData.address) {
+      let storedWalletAddress, storedWalletType;
+      try {
+        storedWalletAddress = localStorage.getItem("walletAddress");
+        storedWalletType = localStorage.getItem("walletType");
+      } catch (error) {
+        console.error("Error accessing localStorage for wallet data:", error);
+        setFormError("Unable to validate wallet due to localStorage restrictions.");
+        return;
+      }
+
+      if (storedWalletAddress && storedWalletType) {
+        const isSameWalletType = storedWalletType === "WalletConnect";
+        const isSameAddress = walletData.address.toLowerCase() === storedWalletAddress.toLowerCase();
+
+        if (!isSameWalletType || !isSameAddress) {
+          setFormError("Connected wallet does not match the one used during signup. Please use the same wallet.");
+          setWalletData({ address: null, balance: null });
+          try {
+            localStorage.removeItem("walletAddress");
+            localStorage.removeItem("walletType");
+          } catch (error) {
+            console.error("Error removing wallet data from localStorage:", error);
+          }
+          return;
+        }
+      }
     }
 
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("hasLoggedInBefore", "true");
+    console.log("Login successful, setting localStorage and navigating...");
+    try {
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("hasLoggedInBefore", "true");
+      console.log("localStorage set: isLoggedIn =", localStorage.getItem("isLoggedIn"));
+    } catch (error) {
+      console.error("Error setting localStorage:", error);
+      setFormError("Login successful, but unable to save login state due to localStorage restrictions.");
+      // Proceed with navigation even if localStorage fails
+    }
 
-    navigate("/connect-wallet");
+    try {
+      navigate("/connect-wallet");
+      console.log("Navigation to /connect-wallet triggered");
+    } catch (error) {
+      console.error("Navigation error:", error);
+      setFormError("Error navigating after login. Please try again.");
+    }
   };
 
   const connectToWalletConnect = async () => {
@@ -73,7 +125,7 @@ function Login() {
         balance: balanceInEth,
       });
 
-      return { web3, address, wcProvider };
+      return { web3, address, wcProvider, walletType: "WalletConnect" };
     } catch (error) {
       setFormError(error.message || "Failed to connect to WalletConnect");
       return false;
@@ -86,12 +138,29 @@ function Login() {
     const result = await connectToWalletConnect();
     if (!result) return;
 
-    const { web3, address, wcProvider } = result;
+    const { web3, address, wcProvider, walletType } = result;
 
     try {
-      const storedWalletAddress = localStorage.getItem("walletAddress");
+      let storedWalletAddress, storedWalletType;
+      try {
+        storedWalletAddress = localStorage.getItem("walletAddress");
+        storedWalletType = localStorage.getItem("walletType");
+      } catch (error) {
+        console.error("Error accessing localStorage for wallet data:", error);
+        throw new Error("Unable to validate wallet due to localStorage restrictions.");
+      }
+
       if (!storedWalletAddress) {
         throw new Error("No wallet address found. Please sign up with WalletConnect first.");
+      }
+
+      if (ENABLE_WALLET_VALIDATION) {
+        const isSameWalletType = storedWalletType === walletType;
+        const isSameAddress = address.toLowerCase() === storedWalletAddress.toLowerCase();
+
+        if (!isSameWalletType || !isSameAddress) {
+          throw new Error("Wallet address or type does not match the registered wallet. Please use the same wallet you signed up with.");
+        }
       }
 
       const message = `Login to Crypto Inheritance Protocol at ${new Date().toISOString()}`;
@@ -102,19 +171,28 @@ function Login() {
         throw new Error("Invalid signature");
       }
 
-      if (address.toLowerCase() !== storedWalletAddress.toLowerCase()) {
-        throw new Error("Wallet address does not match the registered wallet. Please use the same wallet you signed up with.");
+      try {
+        localStorage.setItem("walletAddress", address);
+        localStorage.setItem("walletType", walletType);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("hasLoggedInBefore", "true");
+      } catch (error) {
+        console.error("Error setting localStorage for wallet login:", error);
+        throw new Error("Unable to save wallet login state due to localStorage restrictions.");
       }
 
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("hasLoggedInBefore", "true");
       navigate("/plans");
 
       wcProvider.on("disconnect", () => {
         setWalletData({ address: null, balance: null });
-        localStorage.removeItem("walletAddress");
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("hasLoggedInBefore");
+        try {
+          localStorage.removeItem("walletAddress");
+          localStorage.removeItem("walletType");
+          localStorage.removeItem("isLoggedIn");
+          localStorage.removeItem("hasLoggedInBefore");
+        } catch (error) {
+          console.error("Error removing localStorage on disconnect:", error);
+        }
         navigate("/login");
       });
     } catch (error) {
@@ -239,7 +317,7 @@ function Login() {
                     disabled={isConnecting}
                   >
                     <img
-                      src="/assets/images/walletconnect-logo.png"
+                      src={walletConnectLogo}
                       alt="WalletConnect"
                       className="walletconnect-icon"
                     />
