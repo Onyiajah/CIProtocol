@@ -204,85 +204,77 @@ function Login() {
               <p>Enter your credentials to access your account</p>
             </div>
             <div className="form-fields">
-              <div onTouchEnd={(e) => {
-                console.log("Touch event triggered");
-                handleLogin(e);
-              }}>
-                <form onSubmit={(e) => {
-                  console.log("Form submit triggered");
-                  handleLogin(e);
-                }}>
-                  <div className="form-group">
-                    <label htmlFor="email">Email Address</label>
+              <form onSubmit={handleLogin}>
+                <div className="form-group">
+                  <label htmlFor="email">Email Address</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter Email address"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    autoComplete="email"
+                    autoCapitalize="off"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="password">Password</label>
+                  <div className="password-wrapper">
                     <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      placeholder="Enter Email address"
-                      value={formData.email}
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      placeholder="Enter Password"
+                      value={formData.password}
                       onChange={handleInputChange}
-                      autoComplete="email"
+                      autoComplete="current-password"
                       autoCapitalize="off"
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <div className="password-wrapper">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        id="password"
-                        name="password"
-                        placeholder="Enter Password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        autoComplete="current-password"
-                        autoCapitalize="off"
-                      />
-                      <span
-                        className="toggle-password"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          {showPassword ? (
-                            <path
-                              d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                              fill="#7E7E7E"
-                            />
-                          ) : (
-                            <path
-                              d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l-1.47-1.47C14.27 17.64 13.17 18 12 18c-3.31 0-6-2.69-6-6 0-1.17.34-2.27.89-3.21L5.42 7.32C3.66 8.74 2.45 10.73 2.02 13c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-.43-2.27-1.64-4.26-3.4-5.68l-1.47-1.47C15.97 4.86 14.27 4.5 12 4.5zm0 2c1.17 0 2.27.34 3.21.89l-1.47 1.47C13.79 8.34 12.89 8 12 8c-2.21 0-4 1.79-4 4 0 .89.34 1.79.89 2.44l-1.47 1.47C6.27 14.97 5.5 13.67 5.5 12c0-3.31 2.69-6 6-6zm0 2c1.1 0 2 .9 2 2 0 .22-.04.43-.1.63l-2.53-2.53c.2-.06.41-.1.63-.1zm-2 2c0-1.1.9-2 2-2 .22 0 .43.04.63.1L9.1 11.63c-.06-.2-.1-.41-.1-.63z"
-                              fill="#7E7E7E"
-                            />
-                          )}
-                        </svg>
-                      </span>
-                    </div>
-                    <div className="forgot-password">
-                      <span onClick={handleForgotPassword}>Forgotten Password?</span>
-                    </div>
-                  </div>
-                  {formError && <p className="form-error">{formError}</p>}
-                  <div className="form-buttons">
-                    <button
-                      type="submit"
-                      className="get-started"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        console.log("Button clicked");
-                        handleLogin(e);
-                      }}
+                    <span
+                      className="toggle-password"
+                      onClick={() => setShowPassword(!showPassword)}
                     >
-                      Login
-                    </button>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        {showPassword ? (
+                          <path
+                            d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                            fill="#7E7E7E"
+                          />
+                        ) : (
+                          <path
+                            d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l-1.47-1.47C14.27 17.64 13.17 18 12 18c-3.31 0-6-2.69-6-6 0-1.17.34-2.27.89-3.21L5.42 7.32C3.66 8.74 2.45 10.73 2.02 13c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-.43-2.27-1.64-4.26-3.4-5.68l-1.47-1.47C15.97 4.86 14.27 4.5 12 4.5zm0 2c1.17 0 2.27.34 3.21.89l-1.47 1.47C13.79 8.34 12.89 8 12 8c-2.21 0-4 1.79-4 4 0 .89.34 1.79.89 2.44l-1.47 1.47C6.27 14.97 5.5 13.67 5.5 12c0-3.31 2.69-6 6-6zm0 2c1.1 0 2 .9 2 2 0 .22-.04.43-.1.63l-2.53-2.53c.2-.06.41-.1.63-.1zm-2 2c0-1.1.9-2 2-2 .22 0 .43.04.63.1L9.1 11.63c-.06-.2-.1-.41-.1-.63z"
+                            fill="#7E7E7E"
+                          />
+                        )}
+                      </svg>
+                    </span>
                   </div>
-                </form>
-              </div>
+                  <div className="forgot-password">
+                    <span onClick={handleForgotPassword}>Forgotten Password?</span>
+                  </div>
+                </div>
+                {formError && <p className="form-error">{formError}</p>}
+                <div className="form-buttons">
+                  <button
+                    type="submit"
+                    className="get-started"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      console.log("Button clicked");
+                      handleLogin(e);
+                    }}
+                  >
+                    Login
+                  </button>
+                </div>
+              </form>
               {walletData.address && (
                 <div className="wallet-info">
                   <p>
