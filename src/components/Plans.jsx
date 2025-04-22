@@ -17,7 +17,7 @@ function Plans() {
       <div className="plans-header">
         <div className="logo">
             <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
-          </div>
+          </div> 
         <div className="user-info">
           <span className="hello-text">Hello</span>
           <span className="afolabi-text">Afolabi12345</span>
