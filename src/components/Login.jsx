@@ -40,19 +40,34 @@ function Login() {
 
     setFormError("");
 
-    // Hardcoded email and password for login (bypassing localStorage)
-    const hardcodedEmail = "test@example.com";
-    const hardcodedPassword = "password123";
-
-    if (formData.email !== hardcodedEmail || formData.password !== hardcodedPassword) {
-      setFormError("Invalid email or password. Use test@example.com and password123.");
-      console.log("Error: Invalid email or password");
-      console.log("Expected Email:", hardcodedEmail, "Entered Email:", formData.email);
-      console.log("Expected Password:", hardcodedPassword, "Entered Password:", formData.password);
+    // Retrieve stored user data from localStorage
+    let storedUser;
+    try {
+      storedUser = JSON.parse(localStorage.getItem("user"));
+      console.log("Stored User:", storedUser);
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
+      setFormError("Unable to access localStorage. Please disable private/incognito mode or adjust your browser's privacy settings (e.g., allow cookies and site data).");
       return;
     }
 
-    // Validate wallet if already connected
+    if (!storedUser) {
+      setFormError("No account found. Please sign up first.");
+      console.log("Error: No account found");
+      return;
+    }
+
+    if (storedUser.email !== formData.email || storedUser.password !== formData.password) {
+      setFormError("Invalid email or password.");
+      console.log("Error: Invalid email or password");
+      console.log("Stored Email:", storedUser.email, "Entered Email:", formData.email);
+      console.log("Stored Password:", storedUser.password, "Entered Password:", formData.password);
+      return;
+    }
+
+    console.log("Credentials match, proceeding...");
+
+    // Wallet validation (if enabled)
     if (ENABLE_WALLET_VALIDATION && walletData.address) {
       let storedWalletAddress, storedWalletType;
       try {
@@ -60,7 +75,7 @@ function Login() {
         storedWalletType = localStorage.getItem("walletType");
       } catch (error) {
         console.error("Error accessing localStorage for wallet data:", error);
-        setFormError("Unable to validate wallet due to localStorage restrictions.");
+        setFormError("Unable to validate wallet due to localStorage restrictions. Please adjust your browser settings.");
         return;
       }
 
@@ -93,6 +108,7 @@ function Login() {
       // Proceed with navigation even if localStorage fails
     }
 
+    console.log("Attempting navigation to /connect-wallet...");
     try {
       navigate("/connect-wallet");
       console.log("Navigation to /connect-wallet triggered");
@@ -237,7 +253,7 @@ function Login() {
               <p>Enter your credentials to access your account</p>
             </div>
             <div className="form-fields">
-              <form onSubmit={handleLogin}>
+              <form>
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
                   <input
@@ -293,7 +309,14 @@ function Login() {
                 </div>
                 {formError && <p className="form-error">{formError}</p>}
                 <div className="form-buttons">
-                  <button type="submit" className="get-started">
+                  <button
+                    type="button"
+                    className="get-started"
+                    onClick={(e) => {
+                      console.log("Button click triggered");
+                      handleLogin(e);
+                    }}
+                  >
                     Login
                   </button>
                 </div>
