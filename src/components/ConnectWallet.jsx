@@ -274,7 +274,7 @@ function ConnectWallet() {
       </div>
       <div className="welcome-right">
         <div className="welcome-right-content">
-         <div className="logo">
+          <div className="logo">
             <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="progress-indicator">
