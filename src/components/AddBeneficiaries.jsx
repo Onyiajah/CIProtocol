@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Assets from "./Assets"; // Import Assets
-import "../index.css"; hxn
+import "../index.css";
 
 function AddBeneficiaries() {
   const navigate = useNavigate();
