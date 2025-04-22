@@ -25,9 +25,9 @@ function AddAsset() {
       <Assets /> {/* Preload all images */}
       {/* Sidebar (Left Frame) - Same as Dashboard */}
       <div className="sidebar">
-        <div className="logo">
-          <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
-        </div>
+       <div className="logo">
+            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
+          </div>
         <div className="sidebar-nav">
           <button
             className="sidebar-button dashboard-button active"

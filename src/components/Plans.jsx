@@ -23,18 +23,32 @@ function Plans() {
        <Assets /> {/* Preload all images */}
       <div className="plans-header">
         <div className="logo">
+<<<<<<< HEAD
           <img src={cipLogo} alt="CIP Logo" className="logo-image" />
         </div>
+=======
+            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
+          </div> 
+>>>>>>> 0a6b8974c999cc3e7ec914182835b68ad096cf40
         <div className="user-info">
           <span className="hello-text">Hello</span>
           <span className="afolabi-text">Afolabi12345</span>
           <img
+<<<<<<< HEAD
             src={profile}
             alt="User Avatar"
             className="user-avatar"
           />
           <img
             src={dropdown}
+=======
+            src="/assets/profile.png"
+            alt="Profile"
+            className="user-avatar"
+          />
+          <img
+            src="/assets/dropdown.png"
+>>>>>>> 0a6b8974c999cc3e7ec914182835b68ad096cf40
             alt="Dropdown Arrow"
             className="dropdown-arrow"
           />

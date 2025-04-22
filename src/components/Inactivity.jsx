@@ -53,7 +53,7 @@ function Inactivity() {
       <div className="inactivity-page">
         <div className="sidebar">
           <div className="logo">
-            <img src="../assets/images/logo 1.png" alt="CIP Logo" className="logo-image" />
+            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="sidebar-nav">
             <button

@@ -76,7 +76,7 @@ function PostAssetDashboard() {
   };
 
   const handleViewPlan = (plan) => {
-    navigate(`/plan-details/${planName || "Free"}`, { state: { plan, planName: planName || "Free" } });
+    navigate(`/plan-details/`, { state: { plan, planName: planName || "Free" } });
   };
 
   const isFreePlan = planName === "Free";
