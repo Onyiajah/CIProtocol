@@ -30,11 +30,7 @@ function Welcome() {
       <div className="welcome-right">
         <div className="welcome-right-content">
           <div className="logo">
-<<<<<<< HEAD
           <img src={cipLogo} alt="CIP Logo" className="logo-image" />
-=======
-            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
->>>>>>> 0a6b8974c999cc3e7ec914182835b68ad096cf40
           </div>
           <div className="tutorial">
             <h3>WATCH TUTORIAL</h3>

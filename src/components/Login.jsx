@@ -273,11 +273,7 @@ function Login() {
                     disabled={isConnecting}
                   >
                     <img
-<<<<<<< HEAD
                       src={walletConnectLogo}
-=======
-                      src="/assets/walletconnect-logo.png"
->>>>>>> 0a6b8974c999cc3e7ec914182835b68ad096cf40
                       alt="WalletConnect"
                       className="walletconnect-icon"
                     />
