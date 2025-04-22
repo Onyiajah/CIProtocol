@@ -36,21 +36,17 @@ function Login() {
     e.preventDefault();
     setFormError("");
 
-    // Add localStorage fallback for mobile (private browsing mode)
+    // Attempt to retrieve user data from localStorage
     let storedUser;
     try {
       storedUser = JSON.parse(localStorage.getItem("user"));
-      if (!storedUser) {
-        // Fallback to sessionStorage if localStorage fails
-        storedUser = JSON.parse(sessionStorage.getItem("user"));
-      }
     } catch (error) {
-      // If both localStorage and sessionStorage fail, use in-memory fallback
-      storedUser = window.tempStorage?.user ? JSON.parse(window.tempStorage.user) : null;
+      setFormError("Unable to access account data. Please sign up again on this device or use a regular browser tab (not private/incognito mode).");
+      return;
     }
 
     if (!storedUser) {
-      setFormError("No account found. Please sign up first.");
+      setFormError("No account found. Please sign up on this device using the same browser and URL (e.g., https://your-app.vercel.app).");
       return;
     }
 
@@ -60,35 +56,15 @@ function Login() {
     }
 
     // Skip wallet validation for email/password login
-    if (ENABLE_WALLET_VALIDATION && walletData.address && localStorage.getItem("walletType") === "WalletConnect") {
-      const storedWalletAddress = localStorage.getItem("walletAddress");
-      const storedWalletType = localStorage.getItem("walletType");
+    // Wallet validation should only apply to WalletConnect login attempts
+    // Removed the wallet validation check entirely for email/password login
 
-      if (storedWalletAddress && storedWalletType) {
-        const isSameWalletType = storedWalletType === "WalletConnect";
-        const isSameAddress = walletData.address.toLowerCase() === storedWalletAddress.toLowerCase();
-
-        if (!isSameWalletType || !isSameAddress) {
-          setFormError("Connected wallet does not match the one used during signup. Please use the same wallet.");
-          setWalletData({ address: null, balance: null });
-          localStorage.removeItem("walletAddress");
-          localStorage.removeItem("walletType");
-          return;
-        }
-      }
-    }
-
-    // Save login state with fallback
     try {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("hasLoggedInBefore", "true");
     } catch (error) {
-      sessionStorage.setItem("isLoggedIn", "true");
-      sessionStorage.setItem("hasLoggedInBefore", "true");
-      // In-memory fallback
-      if (!window.tempStorage) window.tempStorage = {};
-      window.tempStorage.isLoggedIn = "true";
-      window.tempStorage.hasLoggedInBefore = "true";
+      setFormError("Unable to save login state. Please use a regular browser tab (not private/incognito mode).");
+      return;
     }
 
     navigate("/connect-wallet");
@@ -279,7 +255,7 @@ function Login() {
                   <p>
                     <strong>Wallet Address:</strong>{" "}
                     <span className="wallet-address">{truncateAddress(walletData.address)}</span>
-                  </p>
+                    </p>
                   <p>
                     <strong>Balance:</strong> {walletData.balance} ETH
                   </p>
