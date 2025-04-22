@@ -3,17 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import Assets from "./Assets";
 import "../index.css";
-import backpacklogo from "../../public/assets/images/backpack-logo.png";
-import exoduslogo from "../../public/assets/images/exodus-logo.png";
-import fireblockslogo from "../../public/assets/images/fireblocks-logo.png";
-import jupiterlogo from "../../public/assets/images/jupiter-logo.png";
-import phantomlogo from "../../public/assets/images/phantom-logo.png";
-import coinbasewalletlogo from "../../public/assets/images/coinbase-wallet-logo.png";
-import bifrostlogo from "../../public/assets/images/bifrost-logo.png";
-import wemixlogo from "../../public/assets/images/wemix-logo.png";
-import btclogo from "../../public/assets/images/btc-logo.png";
-import solflarelogo from "../../public/assets/images/solflare-logo.png";
-import blackfortlogo from "../../public/assets/images/blackfort-logo.png";
+import images from '../assets/images';  
+
+const { walletLogos, uiIcons } = images;
+const {cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, phantomLogo, btcLogo,backpackLogo,
+  cotiLogo, coinbaseLogo, bifrostLogo, wemixLogo, softlareLogo, blackfortLogo } = walletLogos;
+
+const { others } = uiIcons;
+
 
 
 
@@ -259,17 +256,17 @@ function ConnectWallet() {
   };
 
   const wallets = [
-    { name: "Backpack", icon: {backpacklogo}},
-    { name: "Exodus", icon: {exoduslogo}},
-    { name: "Fireblocks", icon: {fireblockslogo}},
-    { name: "Jupiter", icon: {jupiterlogo} },
-    { name: "Phantom", icon: {phantomlogo} },
-    { name: "Coinbase", icon: {coinbasewalletlogo} },
-    { name: "Bifrost", icon: {bifrostlogo} },
-    { name: "WEMIX", icon: {wemixlogo}},
-    { name: "Bitcoin", icon: {btclogo} },
-    { name: "Solflare", icon: {solflarelogo} },
-    { name: "Blackfort", icon: {blackfortlogo} },
+    { name: "Backpack", icon: backpackLogo},
+    { name: "Exodus", icon: exodusLogo},
+    { name: "Fireblocks", icon: fireblocksLogo},
+    { name: "Jupiter", icon: jupiterLogo },
+    { name: "Phantom", icon: phantomLogo },
+    { name: "Coinbase", icon: coinbaseLogo },
+    { name: "Bifrost", icon: bifrostLogo },
+    { name: "WEMIX", icon: wemixLogo},
+    { name: "Bitcoin", icon: btcLogo },
+    { name: "Solflare", icon: softlareLogo },
+    { name: "Blackfort", icon: blackfortLogo },
   ];
 
   const filteredWallets = wallets.filter((wallet) =>
@@ -288,7 +285,7 @@ function ConnectWallet() {
       <div className="welcome-right">
         <div className="welcome-right-content">
           <div className="logo">
-            <img src="/assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+            <img src={cipLogo} alt="CIP Logo" className="logo-image" />
           </div>
           <div className="progress-indicator">
             <span className="progress-step active">1</span>
@@ -322,7 +319,7 @@ function ConnectWallet() {
                   className={`wallet-option ${selectedWallet === "COTI" ? "selected" : ""}`}
                   onClick={() => handleWalletSelect("COTI")}
                 >
-                  <img src="/assets/images/coti-logo.png" alt="COTI" className="wallet-icon" />
+                  <img src={cotiLogo} alt="COTI" className="wallet-icon" />
                   COTI
                   <span className={selectedWallet === "COTI" ? "selected-indicator" : "unselected-indicator"}></span>
                 </button>
@@ -330,7 +327,7 @@ function ConnectWallet() {
                   className={`wallet-option ${selectedWallet === "MetaMask" ? "selected" : ""}`}
                   onClick={() => handleWalletSelect("MetaMask")}
                 >
-                  <img src="/assets/images/metamask.png" alt="MetaMask" className="wallet-icon" />
+                  <img src={metamask} alt="MetaMask" className="wallet-icon" />
                   MetaMask
                   <span className={selectedWallet === "MetaMask" ? "selected-indicator" : "unselected-indicator"}></span>
                 </button>
@@ -338,7 +335,7 @@ function ConnectWallet() {
                   className={`wallet-option ${selectedWallet === "Trust Wallet" ? "selected" : ""}`}
                   onClick={() => handleWalletSelect("Trust Wallet")}
                 >
-                  <img src="/assets/images/trustwallet.png" alt="Trust Wallet" className="wallet-icon" />
+                  <img src={trustwallet} alt="Trust Wallet" className="wallet-icon" />
                   Trust Wallet
                   <span className={selectedWallet === "Trust Wallet" ? "selected-indicator" : "unselected-indicator"}></span>
                 </button>
@@ -348,7 +345,7 @@ function ConnectWallet() {
                 >
                   Other Wallets
                   <img
-                    src="/assets/images/others.png"
+                    src={others}
                     alt="Dropdown Arrow"
                     className={`dropdown-arrow ${isOtherWalletsOpen ? "open" : ""}`}
                   />

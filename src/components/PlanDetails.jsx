@@ -2,6 +2,13 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Assets from "./Assets"; // Import Assets
 import "../index.css";
+import images from '../assets/images';  
+
+const { walletLogos, uiIcons } = images;
+const {cipLogo} = walletLogos;
+
+const {profile} = uiIcons;
+
 
 function PlanDetails() {
   const navigate = useNavigate();
@@ -32,7 +39,7 @@ function PlanDetails() {
       <div className="dashboard-page">
         <div className="sidebar">
           <div className="logo">
-            <img src="../assets/images/logo 1.png" alt="CIP Logo" className="logo-image" />
+            <img src={cipLogo} alt="CIP Logo" className="logo-image" />
           </div>
           <div className="sidebar-nav">
             <button
@@ -59,7 +66,7 @@ function PlanDetails() {
               <span className="bell-icon"></span>
               <span className="user-greeting">Hello, Afolabi12345</span>
               <img
-                src="../assets/images/profile.png"
+                src={profile}
                 alt="User Avatar"
                 className="user-avatar"
               />
@@ -80,7 +87,7 @@ function PlanDetails() {
        <Assets /> {/* Preload all images */}
       <div className="sidebar">
         <div className="logo">
-          <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+          <img src={cipLogo} alt="CIP Logo" className="logo-image" />
         </div>
         <div className="sidebar-nav">
           <button
@@ -107,7 +114,7 @@ function PlanDetails() {
             <span className="bell-icon"></span>
             <span className="user-greeting">Hello, Afolabi12345</span>
             <img
-              src="../assets/images/profile.png"
+              src={profile}
               alt="User Avatar"
               className="user-avatar"
             />

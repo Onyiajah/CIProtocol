@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import plansData from "../data/plansData"; // Updated import path
 import Assets from "./Assets"; // Import Assets
 import "../index.css";
+import images from '../assets/images';  
+
+const { walletLogos, uiIcons } = images;
+const {cipLogo} = walletLogos;
+
+const { profile, dropdown } = uiIcons;
+
 
 function Plans() {
   const navigate = useNavigate();
@@ -16,18 +23,18 @@ function Plans() {
        <Assets /> {/* Preload all images */}
       <div className="plans-header">
         <div className="logo">
-          <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+          <img src={cipLogo} alt="CIP Logo" className="logo-image" />
         </div>
         <div className="user-info">
           <span className="hello-text">Hello</span>
           <span className="afolabi-text">Afolabi12345</span>
           <img
-            src="../assets/images/profile.png"
+            src={profile}
             alt="User Avatar"
             className="user-avatar"
           />
           <img
-            src="../assets/images/dropdown.png"
+            src={dropdown}
             alt="Dropdown Arrow"
             className="dropdown-arrow"
           />

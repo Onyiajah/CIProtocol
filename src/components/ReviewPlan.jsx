@@ -2,6 +2,13 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Assets from "./Assets"; // Import Assets
 import "../index.css";
+import images from '../assets/images';  
+
+const { walletLogos, uiIcons } = images;
+const {cipLogo, cotiLogo, btcLogo} = walletLogos;
+
+const {profile} = uiIcons;
+
 
 function ReviewPlan() {
   const navigate = useNavigate();
@@ -81,7 +88,7 @@ function ReviewPlan() {
        <Assets /> {/* Preload all images */}
       <div className="sidebar">
         <div className="logo">
-          <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+          <img src={cipLogo} alt="CIP Logo" className="logo-image" />
         </div>
         <div className="sidebar-nav">
           <button
@@ -108,7 +115,7 @@ function ReviewPlan() {
             <span className="bell-icon"></span>
             <span className="user-greeting">Hello, Afolabi12345</span>
             <img
-              src="../assets/images/profile.png"
+              src={profile}
               alt="User Avatar"
               className="user-avatar"
             />
@@ -136,7 +143,7 @@ function ReviewPlan() {
             <h3 className="review-item-title">Wallet</h3>
             <div className="review-item-content wallet-content">
               <img
-                src="../assets/images/coti-logo.png"
+                src={cotiLogo}
                 alt="COTI Logo"
                 className="wallet-icon"
               />
@@ -148,7 +155,7 @@ function ReviewPlan() {
             <h3 className="review-item-title">Asset</h3>
             <div className="review-item-content asset-content">
               <img
-                src="../assets/images/btc-logo.png"
+                src={btcLogo}
                 alt="BTC Logo"
                 className="asset-icon"
               />

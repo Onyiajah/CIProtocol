@@ -2,6 +2,9 @@ import React from "react"; // Remove useState since it's no longer needed
 import { useNavigate } from "react-router-dom";
 import Assets from "./Assets"; // Import Assets
 import "../index.css";
+import images from '../assets/images';  
+const { walletLogos } = images;
+const {cipLogo} = walletLogos;
 
 function Welcome() {
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ function Welcome() {
       <div className="welcome-right">
         <div className="welcome-right-content">
           <div className="logo">
-          <img src="/assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
+          <img src={cipLogo} alt="CIP Logo" className="logo-image" />
           </div>
           <div className="tutorial">
             <h3>WATCH TUTORIAL</h3>
