@@ -12,8 +12,6 @@ const {cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, 
 const { others } = uiIcons;
 
 
-hskn
-
 // Enable wallet validation
 const ENABLE_WALLET_VALIDATION = true;
 
