@@ -316,6 +316,10 @@ function Login() {
                       console.log("Button click triggered");
                       handleLogin(e);
                     }}
+                    onTouchEnd={(e) => {
+                      console.log("Button touchend triggered");
+                      handleLogin(e);
+                    }}
                   >
                     Login
                   </button>
