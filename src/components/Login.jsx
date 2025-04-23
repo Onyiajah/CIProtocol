@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import Web3 from "web3";
@@ -22,6 +22,20 @@ function Login() {
   });
   const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
+
+  // Log state changes and detect potential page refreshes
+  useEffect(() => {
+    console.log("formData state updated:", formData);
+  }, [formData]);
+
+  // Prevent "Enter" key from causing a refresh
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      console.log("Enter key pressed, preventing default behavior");
+      e.preventDefault();
+      handleLogin(e);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,7 +61,9 @@ function Login() {
       console.log("Stored User:", storedUser);
     } catch (error) {
       console.error("Error accessing localStorage:", error);
-      setFormError("Unable to access localStorage. Please disable private/incognito mode or adjust your browser's privacy settings (e.g., allow cookies and site data).");
+      setFormError(
+        "Unable to access localStorage. This may be due to private/incognito mode or strict privacy settings. Please disable private mode or allow cookies and site data in your browser settings."
+      );
       return;
     }
 
@@ -253,7 +269,7 @@ function Login() {
               <p>Enter your credentials to access your account</p>
             </div>
             <div className="form-fields">
-              <form>
+              <div>
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
                   <input
@@ -263,6 +279,7 @@ function Login() {
                     placeholder="Enter Email address"
                     value={formData.email}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     required
                   />
                 </div>
@@ -276,6 +293,7 @@ function Login() {
                       placeholder="Enter Password"
                       value={formData.password}
                       onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
                       required
                     />
                     <span
@@ -324,7 +342,7 @@ function Login() {
                     Login
                   </button>
                 </div>
-              </form>
+              </div>
               {walletData.address && (
                 <div className="wallet-info">
                   <p>
