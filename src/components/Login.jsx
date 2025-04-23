@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import Web3 from "web3";
 import Assets from "./Assets";
 import "../index.css";
 import walletConnectLogo from "../../public/assets/images/walletconnect-logo.png";
+
 
 // Enable wallet validation during login
 const ENABLE_WALLET_VALIDATION = true;
@@ -23,23 +24,8 @@ function Login() {
   const [isConnecting, setIsConnecting] = useState(false);
   const navigate = useNavigate();
 
-  // Log state changes and detect potential page refreshes
-  useEffect(() => {
-    console.log("formData state updated:", formData);
-  }, [formData]);
-
-  // Prevent "Enter" key from causing a refresh
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      console.log("Enter key pressed, preventing default behavior");
-      e.preventDefault();
-      handleLogin(e);
-    }
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Input changed: ${name} = ${value}`);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -49,89 +35,41 @@ function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("handleLogin triggered");
-    console.log("Form Data:", formData);
-
     setFormError("");
 
-    // Retrieve stored user data from localStorage
-    let storedUser;
-    try {
-      storedUser = JSON.parse(localStorage.getItem("user"));
-      console.log("Stored User:", storedUser);
-    } catch (error) {
-      console.error("Error accessing localStorage:", error);
-      setFormError(
-        "Unable to access localStorage. This may be due to private/incognito mode or strict privacy settings. Please disable private mode or allow cookies and site data in your browser settings."
-      );
-      return;
-    }
-
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) {
       setFormError("No account found. Please sign up first.");
-      console.log("Error: No account found");
       return;
     }
 
     if (storedUser.email !== formData.email || storedUser.password !== formData.password) {
       setFormError("Invalid email or password.");
-      console.log("Error: Invalid email or password");
-      console.log("Stored Email:", storedUser.email, "Entered Email:", formData.email);
-      console.log("Stored Password:", storedUser.password, "Entered Password:", formData.password);
       return;
     }
 
-    console.log("Credentials match, proceeding...");
-
-    // Wallet validation (if enabled)
+    // Validate wallet if already connected
     if (ENABLE_WALLET_VALIDATION && walletData.address) {
-      let storedWalletAddress, storedWalletType;
-      try {
-        storedWalletAddress = localStorage.getItem("walletAddress");
-        storedWalletType = localStorage.getItem("walletType");
-      } catch (error) {
-        console.error("Error accessing localStorage for wallet data:", error);
-        setFormError("Unable to validate wallet due to localStorage restrictions. Please adjust your browser settings.");
-        return;
-      }
+      const storedWalletAddress = localStorage.getItem("walletAddress");
+      const storedWalletType = localStorage.getItem("walletType");
 
       if (storedWalletAddress && storedWalletType) {
-        const isSameWalletType = storedWalletType === "WalletConnect";
+        const isSameWalletType = storedWalletType === "WalletConnect"; // Adjust if other wallet types are supported
         const isSameAddress = walletData.address.toLowerCase() === storedWalletAddress.toLowerCase();
 
         if (!isSameWalletType || !isSameAddress) {
           setFormError("Connected wallet does not match the one used during signup. Please use the same wallet.");
           setWalletData({ address: null, balance: null });
-          try {
-            localStorage.removeItem("walletAddress");
-            localStorage.removeItem("walletType");
-          } catch (error) {
-            console.error("Error removing wallet data from localStorage:", error);
-          }
+          localStorage.removeItem("walletAddress");
+          localStorage.removeItem("walletType");
           return;
         }
       }
     }
 
-    console.log("Login successful, setting localStorage and navigating...");
-    try {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("hasLoggedInBefore", "true");
-      console.log("localStorage set: isLoggedIn =", localStorage.getItem("isLoggedIn"));
-    } catch (error) {
-      console.error("Error setting localStorage:", error);
-      setFormError("Login successful, but unable to save login state due to localStorage restrictions.");
-      // Proceed with navigation even if localStorage fails
-    }
-
-    console.log("Attempting navigation to /connect-wallet...");
-    try {
-      navigate("/connect-wallet");
-      console.log("Navigation to /connect-wallet triggered");
-    } catch (error) {
-      console.error("Navigation error:", error);
-      setFormError("Error navigating after login. Please try again.");
-    }
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("hasLoggedInBefore", "true");
+    navigate("/connect-wallet");
   };
 
   const connectToWalletConnect = async () => {
@@ -173,19 +111,14 @@ function Login() {
     const { web3, address, wcProvider, walletType } = result;
 
     try {
-      let storedWalletAddress, storedWalletType;
-      try {
-        storedWalletAddress = localStorage.getItem("walletAddress");
-        storedWalletType = localStorage.getItem("walletType");
-      } catch (error) {
-        console.error("Error accessing localStorage for wallet data:", error);
-        throw new Error("Unable to validate wallet due to localStorage restrictions.");
-      }
+      const storedWalletAddress = localStorage.getItem("walletAddress");
+      const storedWalletType = localStorage.getItem("walletType");
 
       if (!storedWalletAddress) {
         throw new Error("No wallet address found. Please sign up with WalletConnect first.");
       }
 
+      // Validate wallet against signup wallet
       if (ENABLE_WALLET_VALIDATION) {
         const isSameWalletType = storedWalletType === walletType;
         const isSameAddress = address.toLowerCase() === storedWalletAddress.toLowerCase();
@@ -195,7 +128,7 @@ function Login() {
         }
       }
 
-      const message = `Login to Crypto Inheritance Protocol at ${new Date().toISOString()}`;
+      const message = Login to Crypto Inheritance Protocol at ${new Date().toISOString()};
       const signature = await web3.eth.personal.sign(message, address, "");
 
       const recoveredAddress = await web3.eth.personal.ecRecover(message, signature);
@@ -203,28 +136,19 @@ function Login() {
         throw new Error("Invalid signature");
       }
 
-      try {
-        localStorage.setItem("walletAddress", address);
-        localStorage.setItem("walletType", walletType);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("hasLoggedInBefore", "true");
-      } catch (error) {
-        console.error("Error setting localStorage for wallet login:", error);
-        throw new Error("Unable to save wallet login state due to localStorage restrictions.");
-      }
-
+      // Store wallet type
+      localStorage.setItem("walletAddress", address);
+      localStorage.setItem("walletType", walletType);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("hasLoggedInBefore", "true");
       navigate("/plans");
 
       wcProvider.on("disconnect", () => {
         setWalletData({ address: null, balance: null });
-        try {
-          localStorage.removeItem("walletAddress");
-          localStorage.removeItem("walletType");
-          localStorage.removeItem("isLoggedIn");
-          localStorage.removeItem("hasLoggedInBefore");
-        } catch (error) {
-          console.error("Error removing localStorage on disconnect:", error);
-        }
+        localStorage.removeItem("walletAddress");
+        localStorage.removeItem("walletType");
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("hasLoggedInBefore");
         navigate("/login");
       });
     } catch (error) {
@@ -239,7 +163,7 @@ function Login() {
 
   const truncateAddress = (address) => {
     if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    return ${address.slice(0, 6)}...${address.slice(-4)};
   };
 
   return (
@@ -269,7 +193,7 @@ function Login() {
               <p>Enter your credentials to access your account</p>
             </div>
             <div className="form-fields">
-              <div>
+              <form onSubmit={handleLogin}>
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
                   <input
@@ -279,7 +203,6 @@ function Login() {
                     placeholder="Enter Email address"
                     value={formData.email}
                     onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
                     required
                   />
                 </div>
@@ -293,7 +216,6 @@ function Login() {
                       placeholder="Enter Password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      onKeyDown={handleKeyDown}
                       required
                     />
                     <span
@@ -327,22 +249,11 @@ function Login() {
                 </div>
                 {formError && <p className="form-error">{formError}</p>}
                 <div className="form-buttons">
-                  <button
-                    type="button"
-                    className="get-started"
-                    onClick={(e) => {
-                      console.log("Button click triggered");
-                      handleLogin(e);
-                    }}
-                    onTouchEnd={(e) => {
-                      console.log("Button touchend triggered");
-                      handleLogin(e);
-                    }}
-                  >
+                  <button type="submit" className="get-started">
                     Login
                   </button>
                 </div>
-              </div>
+              </form>
               {walletData.address && (
                 <div className="wallet-info">
                   <p>
@@ -379,3 +290,5 @@ function Login() {
 }
 
 export default Login;
+
+
