@@ -13,7 +13,7 @@ const ENABLE_WALLET_VALIDATION = true;
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
+    password: "", 
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState("");
