@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import Web3 from "web3";
 import Assets from "./Assets";
+import userDatabase from "../userDatabase"; // Fixed import path
 import "../index.css";
 import walletConnectLogo from "../../public/assets/images/walletconnect-logo.png";
-
 
 // Enable wallet validation during login
 const ENABLE_WALLET_VALIDATION = true;
@@ -37,38 +37,23 @@ function Login() {
     e.preventDefault();
     setFormError("");
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
-      setFormError("No account found. Please sign up first.");
+    const users = userDatabase.getUsers();
+    const user = users.find((u) => u.email.toLowerCase() === formData.email.toLowerCase());
+
+    if (!user) {
+      setFormError("No account found");
       return;
     }
 
-    if (storedUser.email !== formData.email || storedUser.password !== formData.password) {
-      setFormError("Invalid email or password.");
+    if (user.password !== formData.password) {
+      setFormError("Invalid email or password");
       return;
     }
 
-    // Validate wallet if already connected
-    if (ENABLE_WALLET_VALIDATION && walletData.address) {
-      const storedWalletAddress = localStorage.getItem("walletAddress");
-      const storedWalletType = localStorage.getItem("walletType");
+    userDatabase.updateUser(formData.email, {
+      hasLoggedInBefore: true,
+    });
 
-      if (storedWalletAddress && storedWalletType) {
-        const isSameWalletType = storedWalletType === "WalletConnect"; // Adjust if other wallet types are supported
-        const isSameAddress = walletData.address.toLowerCase() === storedWalletAddress.toLowerCase();
-
-        if (!isSameWalletType || !isSameAddress) {
-          setFormError("Connected wallet does not match the one used during signup. Please use the same wallet.");
-          setWalletData({ address: null, balance: null });
-          localStorage.removeItem("walletAddress");
-          localStorage.removeItem("walletType");
-          return;
-        }
-      }
-    }
-
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("hasLoggedInBefore", "true");
     navigate("/connect-wallet");
   };
 
@@ -111,24 +96,7 @@ function Login() {
     const { web3, address, wcProvider, walletType } = result;
 
     try {
-      const storedWalletAddress = localStorage.getItem("walletAddress");
-      const storedWalletType = localStorage.getItem("walletType");
-
-      if (!storedWalletAddress) {
-        throw new Error("No wallet address found. Please sign up with WalletConnect first.");
-      }
-
-      // Validate wallet against signup wallet
-      if (ENABLE_WALLET_VALIDATION) {
-        const isSameWalletType = storedWalletType === walletType;
-        const isSameAddress = address.toLowerCase() === storedWalletAddress.toLowerCase();
-
-        if (!isSameWalletType || !isSameAddress) {
-          throw new Error("Wallet address or type does not match the registered wallet. Please use the same wallet you signed up with.");
-        }
-      }
-
-      const message = Login to Crypto Inheritance Protocol at ${new Date().toISOString()};
+      const message = `Login to Crypto Inheritance Protocol at ${new Date().toISOString()}`;
       const signature = await web3.eth.personal.sign(message, address, "");
 
       const recoveredAddress = await web3.eth.personal.ecRecover(message, signature);
@@ -136,19 +104,18 @@ function Login() {
         throw new Error("Invalid signature");
       }
 
-      // Store wallet type
-      localStorage.setItem("walletAddress", address);
-      localStorage.setItem("walletType", walletType);
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("hasLoggedInBefore", "true");
+      const walletUsers = userDatabase.getWalletUsers();
+      const existingWallet = walletUsers.find((addr) => addr.toLowerCase() === address.toLowerCase());
+
+      if (!existingWallet) {
+        userDatabase.addWalletUser(address);
+      }
+
       navigate("/plans");
 
       wcProvider.on("disconnect", () => {
+        userDatabase.clearWalletUser(address);
         setWalletData({ address: null, balance: null });
-        localStorage.removeItem("walletAddress");
-        localStorage.removeItem("walletType");
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("hasLoggedInBefore");
         navigate("/login");
       });
     } catch (error) {
@@ -163,7 +130,7 @@ function Login() {
 
   const truncateAddress = (address) => {
     if (!address) return "";
-    return ${address.slice(0, 6)}...${address.slice(-4)};
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   return (

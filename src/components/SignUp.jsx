@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import Web3 from "web3";
 import Assets from "./Assets";
+import userDatabase from "../userDatabase"; // Fixed import path
 import "../index.css";
 
 function SignUp() {
@@ -57,8 +58,9 @@ function SignUp() {
     if (!validateForm()) return;
     setFormError("");
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser && storedUser.email === formData.email) {
+    const users = userDatabase.getUsers();
+    const existingUser = users.find((user) => user.email === formData.email);
+    if (existingUser) {
       setFormError("Email already exists. Please log in or use a different email.");
       return;
     }
@@ -66,9 +68,9 @@ function SignUp() {
     const user = {
       email: formData.email,
       password: formData.password,
+      hasLoggedInBefore: false,
     };
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("hasLoggedInBefore", "false");
+    userDatabase.addUser(user);
 
     navigate("/login");
   };
@@ -126,20 +128,15 @@ function SignUp() {
         throw new Error("Invalid signature");
       }
 
-      const storedWalletAddress = localStorage.getItem("walletAddress");
+      const walletUsers = userDatabase.getWalletUsers();
+      const existingWallet = walletUsers.find((addr) => addr.toLowerCase() === address.toLowerCase());
 
-      if (storedWalletAddress && storedWalletAddress.toLowerCase() === address.toLowerCase()) {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("hasLoggedInBefore", "true");
-        localStorage.setItem("walletAddress", address);
+      if (existingWallet) {
         navigate("/plans");
         return;
       }
 
-      localStorage.setItem("walletAddress", address);
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("hasLoggedInBefore", "false");
-
+      userDatabase.addWalletUser(address);
       navigate("/plans");
     } catch (error) {
       setFormError(error.message || "WalletConnect signup failed");
@@ -149,11 +146,12 @@ function SignUp() {
 
   const handleDisconnect = async () => {
     if (walletConnectProvider) {
+      userDatabase.clearWalletUser(walletData.address);
       await walletConnectProvider.disconnect();
       setWalletConnectProvider(null);
+      setWalletData({ address: null, balance: null });
+      alert("Disconnected from wallet.");
     }
-    setWalletData({ address: null, balance: null });
-    alert("Disconnected from wallet.");
   };
 
   const handleCopyAddress = () => {
@@ -167,6 +165,7 @@ function SignUp() {
 
     const handleAccountsChanged = async (newAccounts) => {
       if (newAccounts.length === 0) {
+        userDatabase.clearWalletUser(walletData.address);
         setWalletData({ address: null, balance: null });
         setWalletConnectProvider(null);
         alert("Disconnected from wallet.");
@@ -354,10 +353,10 @@ function SignUp() {
                   disabled={isConnecting}
                 >
                   <img
-                      src="/assets/walletconnect-logo.png"
-                      alt="WalletConnect"
-                      className="walletconnect-icon"
-                    />
+                    src="/assets/walletconnect-logo.png"
+                    alt="WalletConnect"
+                    className="walletconnect-icon"
+                  />
                   {isConnecting ? "Connecting..." : "Sign Up with WalletConnect"}
                 </button>
               </div>
