@@ -8,7 +8,7 @@ import "../index.css";
 
 function SignUp() {
   const [formData, setFormData] = useState({
-    email: "",
+    email: "", 
     password: "",
     confirmPassword: "",
   });
