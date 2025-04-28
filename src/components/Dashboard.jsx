@@ -16,6 +16,7 @@ function Dashboard() {
 
   // Use planName from params if available, otherwise fall back to localStorage
   const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
+  const loggedonuser = localStorage.getItem("emailLoggedIn");
 
   const handlePlansClick = () => {
     navigate("/plans");
@@ -58,7 +59,7 @@ function Dashboard() {
           <h1 className="dashboard-title">Dashboard</h1>
           <div className="user-info">
             <span className="bell-icon"></span>
-            <span className="user-greeting">Hello, Afolabi12345</span>
+            <span className="user-greeting">Hello, {loggedonuser}</span>
             <img
               src={profile}
               alt="User Avatar"

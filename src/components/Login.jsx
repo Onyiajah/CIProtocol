@@ -51,8 +51,10 @@ function Login() {
           email: formData.email,
           password: formData.password
         }),
-      });
+        
 
+      });
+      
       const data = await response.json();
       
       if (!response.ok) {
@@ -61,8 +63,12 @@ function Login() {
 
       // Store the token in localStorage
       localStorage.setItem('authToken', data.token);
-      
-      navigate("/connect-wallet");
+      localStorage.setItem('emailLoggedIn', data.user.email);
+      localStorage.setItem('walletAddress', data.user.wallet);
+      console.log("Navigation attempted to connect-wallet");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 100);
     } catch (error) {
       setFormError(error.message || "Invalid email or password");
     } finally {
