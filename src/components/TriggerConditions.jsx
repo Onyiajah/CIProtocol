@@ -15,10 +15,6 @@ function TriggerConditions() {
     setSelectedTerm(event.target.value);
   };
 
-  // Use planName from params if available, otherwise fall back to localStorage
-  const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
-  const loggedonuser = localStorage.getItem("emailLoggedIn");
-  
   const handleNextClick = () => {
     if (!selectedTerm) {
       alert("Please select a term before proceeding.");
