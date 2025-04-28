@@ -67,7 +67,7 @@ function Login() {
       localStorage.setItem('walletAddress', data.user.wallet);
       console.log("Navigation attempted to connect-wallet");
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/connect-wallet");
       }, 100);
     } catch (error) {
       setFormError(error.message || "Invalid email or password");
