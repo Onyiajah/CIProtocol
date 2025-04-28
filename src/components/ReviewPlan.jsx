@@ -9,10 +9,6 @@ const {cipLogo, cotiLogo, btcLogo} = walletLogos;
 
 const {profile} = uiIcons;
 
-// Use planName from params if available, otherwise fall back to localStorage
-  const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
-  const loggedonuser = localStorage.getItem("emailLoggedIn");
-
 function ReviewPlan() {
   const navigate = useNavigate();
   const location = useLocation();
