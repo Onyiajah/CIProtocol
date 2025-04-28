@@ -8,10 +8,6 @@ const { walletLogos, uiIcons } = images;
 const {cipLogo} = walletLogos;
 
 const {profile} = uiIcons;
-// Use planName from params if available, otherwise fall back to localStorage
-  const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
-  const loggedonuser = localStorage.getItem("emailLoggedIn");
-
 
 function PlanDetails() {
   const navigate = useNavigate();
