@@ -22,7 +22,10 @@ function SignUp() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [formError, setFormError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const API_URL = "http://localhost:3001/api/auth";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,26 +56,38 @@ function SignUp() {
     return true;
   };
 
-  const handleEmailSignUp = (e) => {
+  const handleEmailSignUp = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    
+    setIsSubmitting(true);
     setFormError("");
 
-    const users = userDatabase.getUsers();
-    const existingUser = users.find((user) => user.email === formData.email);
-    if (existingUser) {
-      setFormError("Email already exists. Please log in or use a different email.");
-      return;
+    try {
+      const response = await fetch(`${API_URL}/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          wallet: walletData.address || null
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to sign up");
+      }
+
+      navigate("/login");
+    } catch (error) {
+      setFormError(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const user = {
-      email: formData.email,
-      password: formData.password,
-      hasLoggedInBefore: false,
-    };
-    userDatabase.addUser(user);
-
-    navigate("/login");
   };
 
   const connectViaWalletConnect = async () => {
@@ -128,15 +143,31 @@ function SignUp() {
         throw new Error("Invalid signature");
       }
 
-      const walletUsers = userDatabase.getWalletUsers();
-      const existingWallet = walletUsers.find((addr) => addr.toLowerCase() === address.toLowerCase());
+      // Check if wallet address exists in backend
+      const response = await fetch(`${API_URL}/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: `${address.toLowerCase()}@wallet.user`, // Use wallet address as email
+          password: message + signature.slice(0, 10), // Create a deterministic password from signature
+          wallet: address
+        }),
+      });
 
-      if (existingWallet) {
-        navigate("/plans");
-        return;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        // If error is "Email already exists", user already registered so proceed to login
+        if (data.error === "Email already exists") {
+          navigate("/plans");
+          return;
+        } else {
+          throw new Error(data.error || "Failed to sign up with wallet");
+        }
       }
 
-      userDatabase.addWalletUser(address);
       navigate("/plans");
     } catch (error) {
       setFormError(error.message || "WalletConnect signup failed");
@@ -146,7 +177,6 @@ function SignUp() {
 
   const handleDisconnect = async () => {
     if (walletConnectProvider) {
-      userDatabase.clearWalletUser(walletData.address);
       await walletConnectProvider.disconnect();
       setWalletConnectProvider(null);
       setWalletData({ address: null, balance: null });
@@ -165,7 +195,6 @@ function SignUp() {
 
     const handleAccountsChanged = async (newAccounts) => {
       if (newAccounts.length === 0) {
-        userDatabase.clearWalletUser(walletData.address);
         setWalletData({ address: null, balance: null });
         setWalletConnectProvider(null);
         alert("Disconnected from wallet.");
@@ -322,6 +351,9 @@ function SignUp() {
                   </span>
                 </div>
                 {formError && <p className="form-error">{formError}</p>}
+                <div className="login-link">
+    <p>Already have an account? <span onClick={() => navigate("/login")} className="login-text">Log In</span></p>
+  </div>
               </form>
             </div>
             {walletData.address && (
@@ -343,8 +375,13 @@ function SignUp() {
             )}
             {!walletData.address && (
               <div className="form-buttons">
-                <button type="submit" form="signup-form" className="get-started">
-                  Next
+                <button 
+                  type="submit" 
+                  form="signup-form" 
+                  className="get-started"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Processing..." : "Next"}
                 </button>
                 <div className="or-separator">Or</div>
                 <button

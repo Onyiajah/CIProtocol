@@ -22,7 +22,10 @@ function Login() {
     balance: null,
   });
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const API_URL = "http://localhost:3001/api/auth";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,28 +36,38 @@ function Login() {
     setFormError("");
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setFormError("");
+    setIsSubmitting(true);
 
-    const users = userDatabase.getUsers();
-    const user = users.find((u) => u.email.toLowerCase() === formData.email.toLowerCase());
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
 
-    if (!user) {
-      setFormError("No account found");
-      return;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      // Store the token in localStorage
+      localStorage.setItem('authToken', data.token);
+      
+      navigate("/connect-wallet");
+    } catch (error) {
+      setFormError(error.message || "Invalid email or password");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (user.password !== formData.password) {
-      setFormError("Invalid email or password");
-      return;
-    }
-
-    userDatabase.updateUser(formData.email, {
-      hasLoggedInBefore: true,
-    });
-
-    navigate("/connect-wallet");
   };
 
   const connectToWalletConnect = async () => {
@@ -93,7 +106,7 @@ function Login() {
     const result = await connectToWalletConnect();
     if (!result) return;
 
-    const { web3, address, wcProvider, walletType } = result;
+    const { web3, address, wcProvider } = result;
 
     try {
       const message = `Login to Crypto Inheritance Protocol at ${new Date().toISOString()}`;
@@ -104,17 +117,85 @@ function Login() {
         throw new Error("Invalid signature");
       }
 
-      const walletUsers = userDatabase.getWalletUsers();
-      const existingWallet = walletUsers.find((addr) => addr.toLowerCase() === address.toLowerCase());
+      // Try to login with wallet address
+      try {
+        const walletEmail = `${address.toLowerCase()}@wallet.user`;
+        const walletPassword = message + signature.slice(0, 10);
+        
+        const response = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: walletEmail,
+            password: walletPassword
+          }),
+        });
 
-      if (!existingWallet) {
-        userDatabase.addWalletUser(address);
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Store the token in localStorage
+          localStorage.setItem('authToken', data.token);
+          navigate("/plans");
+          return;
+        }
+      } catch (loginError) {
+        // If login fails, we'll try to register the wallet
+        console.log("Wallet login failed, trying registration");
       }
 
-      navigate("/plans");
+      // If login failed, try to register the wallet
+      try {
+        const walletEmail = `${address.toLowerCase()}@wallet.user`;
+        const walletPassword = message + signature.slice(0, 10);
+        
+        const registerResponse = await fetch(`${API_URL}/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: walletEmail,
+            password: walletPassword,
+            wallet: address
+          }),
+        });
 
+        const registerData = await registerResponse.json();
+        
+        if (!registerResponse.ok && registerData.error !== "Email already exists") {
+          throw new Error(registerData.error || "Failed to register wallet");
+        }
+
+        // Login after registration
+        const loginResponse = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: walletEmail,
+            password: walletPassword
+          }),
+        });
+
+        const loginData = await loginResponse.json();
+        
+        if (loginResponse.ok) {
+          localStorage.setItem('authToken', loginData.token);
+          navigate("/plans");
+        } else {
+          throw new Error(loginData.error || "Failed to login after registration");
+        }
+      } catch (error) {
+        throw new Error(error.message || "Wallet registration failed");
+      }
+
+      // Set up disconnect event
       wcProvider.on("disconnect", () => {
-        userDatabase.clearWalletUser(address);
+        localStorage.removeItem('authToken');
         setWalletData({ address: null, balance: null });
         navigate("/login");
       });
@@ -126,6 +207,10 @@ function Login() {
 
   const handleForgotPassword = () => {
     navigate("/forgot-password");
+  };
+  
+  const handleSignUp = () => {
+    navigate("/signup");
   };
 
   const truncateAddress = (address) => {
@@ -216,11 +301,16 @@ function Login() {
                 </div>
                 {formError && <p className="form-error">{formError}</p>}
                 <div className="form-buttons">
-                  <button type="submit" className="get-started">
-                    Login
+                  <button 
+                    type="submit" 
+                    className="get-started"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Processing..." : "Login"}
                   </button>
                 </div>
               </form>
+              
               {walletData.address && (
                 <div className="wallet-info">
                   <p>
@@ -232,15 +322,16 @@ function Login() {
                   </p>
                 </div>
               )}
+              
               {!walletData.address && (
-                <div>
+                <div className="wallet-connect-container">
                   <button
                     className="walletconnect-signup"
                     onClick={handleWalletConnectLogin}
                     disabled={isConnecting}
                   >
                     <img
-                      src={walletConnectLogo}
+                      src="/assets/walletconnect-logo.png"
                       alt="WalletConnect"
                       className="walletconnect-icon"
                     />
@@ -248,6 +339,11 @@ function Login() {
                   </button>
                 </div>
               )}
+              
+              <div className="signup-link">
+                <p>Don't have an account?</p>
+                <span onClick={handleSignUp} className="signup-text">Sign Up</span>
+              </div>
             </div>
           </div>
         </div>

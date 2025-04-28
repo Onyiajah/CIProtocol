@@ -2352,3 +2352,44 @@ form {
     font-size: 18px;
   }
 }
+
+.signup-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  width: 100%;
+  font-size: 14px;
+  color: #666;
+  gap: 5px; 
+}
+
+.signup-text {
+  color: #ae5b1f;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  text-decoration: none; 
+}
+
+.signup-text:hover {
+  color: #8B4513;
+  text-decoration: underline; 
+}
+
+
+.login-link {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.login-text {
+  color: #8B4513;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-text:hover {
+  text-decoration: underline;
+}
