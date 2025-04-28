@@ -25,7 +25,7 @@ function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:3001/api/auth";
+  const API_URL = "https://cipbackend-two.vercel.app/api/auth";
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
