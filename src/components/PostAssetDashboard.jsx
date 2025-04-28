@@ -19,10 +19,6 @@ function PostAssetDashboard() {
 
   const [plans, setPlans] = useState([]);
 
-  // Use planName from params if available, otherwise fall back to localStorage
-  const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
-  const loggedonuser = localStorage.getItem("emailLoggedIn");
-
   useEffect(() => {
     // Fetch existing plans from localStorage
     let storedPlans = JSON.parse(localStorage.getItem("plans")) || [];
