@@ -9,9 +9,6 @@ const {cipLogo} = walletLogos;
 
 const {profile} = uiIcons;
 
-// Use planName from params if available, otherwise fall back to localStorage
-  const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
-  const loggedonuser = localStorage.getItem("emailLoggedIn");
 
 
 function PostAssetDashboard() {
@@ -21,6 +18,10 @@ function PostAssetDashboard() {
   const { newPlan, upgradedFromFree } = location.state || {};
 
   const [plans, setPlans] = useState([]);
+
+  // Use planName from params if available, otherwise fall back to localStorage
+  const planName = planNameFromParams || localStorage.getItem("userPlan") || "Free";
+  const loggedonuser = localStorage.getItem("emailLoggedIn");
 
   useEffect(() => {
     // Fetch existing plans from localStorage
