@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import Assets from "./Assets";
 import "../index.css";
-import images from '../assets/images';  
+import images from '../assets/images';
 
 const { walletLogos, uiIcons } = images;
 const {cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, phantomLogo, btcLogo,backpackLogo,
@@ -23,9 +23,9 @@ function ConnectWallet() {
   const [web3, setWeb3] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState("COTI");
-  const [isOtherWalletsOpen, setIsOtherWalletsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedWallet, setSelectedWallet]("COTI");
+  const [isOtherWalletsOpen, setIsOtherWalletsOpen](false);
+  const [searchQuery, setSearchQuery]([]);
   const navigate = useNavigate();
 
   const connectToEthereumWallet = async (walletType) => {
@@ -86,7 +86,7 @@ function ConnectWallet() {
     try {
       setIsConnecting(true);
       alert("Connecting to COTI wallet... (Placeholder implementation)");
-      
+
       const walletInfo = {
         address: "coti1exampleaddress1234567890abcdef",
         balance: "100 COTI",
@@ -393,7 +393,7 @@ function ConnectWallet() {
                 >
                   {isConnecting ? "Connecting..." : "Connect Wallet"}
                 </button>
-              </div>
+              </div>s
             )}
           </div>
         </div>
