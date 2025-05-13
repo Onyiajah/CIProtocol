@@ -1,435 +1,809 @@
 import React, { useState, useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import Web3 from "web3";
+
 import Assets from "./Assets";
+
 import "../index.css";
-import images from '../assets/images';
+
+import images from '../assets/images';  
+
+
 
 const { walletLogos, uiIcons } = images;
-const { cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, phantomLogo, btcLogo, backpackLogo,
-  cotiLogo, coinbaseLogo, bifrostLogo, wemixLogo, softlareLogo, blackfortLogo } = walletLogos;
+
+const {cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, phantomLogo, btcLogo,backpackLogo,
+
+  cotiLogo, coinbaseLogo, bifrostLogo, wemixLogo, softlareLogo, blackfortLogo } = walletLogos;
+
+
+
 const { others } = uiIcons;
 
+
+
+
+
 // Enable wallet validation
+
 const ENABLE_WALLET_VALIDATION = true;
 
+
+
 function ConnectWallet() {
-  const [walletData, setWalletData] = useState({
-    address: null,
-    balance: null,
-  });
-  const [web3, setWeb3] = useState(null);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState("COTI");
-  const [isOtherWalletsOpen, setIsOtherWalletsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
 
-  const connectToEthereumWallet = async (walletType) => {
-    try {
-      setIsConnecting(true);
+  const [walletData, setWalletData] = useState({
 
-      // Check if MetaMask (or compatible wallet) is installed
-      if (!window.ethereum) {
-        alert(`Please install ${walletType} or a compatible Ethereum wallet to continue!`);
-        return { success: false };
-      }
+    address: null,
 
-      // Detect if the wallet is MetaMask or a compatible wallet
-      const isMetaMask = window.ethereum.isMetaMask;
-      console.log(`Connecting to ${walletType}${isMetaMask ? " (MetaMask detected)" : ""}`);
+    balance: null,
 
-      // Initialize Web3 with the provider
-      const newWeb3 = new Web3(window.ethereum);
-      setWeb3(newWeb3);
+  });
 
-      // Request account access
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+  const [web3, setWeb3] = useState(null);
 
-      if (accounts.length === 0) {
-        alert(`No accounts found. Please connect an account in ${walletType}.`);
-        return { success: false };
-      }
+  const [isConnecting, setIsConnecting] = useState(false);
 
-      const account = accounts[0];
+  const [copied, setCopied] = useState(false);
 
-      // Ensure the wallet is connected to the Ethereum mainnet (chainId: 1) or a compatible network
-      const chainId = await window.ethereum.request({ method: "eth_chainId" });
-      if (chainId !== "0x1") { // Ethereum Mainnet
-        try {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x1" }],
-          });
-        } catch (switchError) {
-          // If the chain is not added, prompt the user to add it
-          if (switchError.code === 4902) {
-            alert("Please add the Ethereum Mainnet in your wallet.");
-          } else {
-            alert("Please switch to the Ethereum Mainnet in your wallet.");
-          }
-          return { success: false };
-        }
-      }
+  const [selectedWallet, setSelectedWallet] = useState("COTI");
 
-      // Get balance
-      const balance = await newWeb3.eth.getBalance(account);
-      const balanceInEth = newWeb3.utils.fromWei(balance, "ether");
+  const [isOtherWalletsOpen, setIsOtherWalletsOpen] = useState(false);
 
-      const walletInfo = {
-        address: account,
-        balance: `${balanceInEth} ETH`,
-      };
+  const [searchQuery, setSearchQuery] = useState("");
 
-      setWalletData(walletInfo);
+  const navigate = useNavigate();
 
-      // Sign a message to verify wallet ownership
-      const message = `Connecting wallet to Crypto Inheritance Protocol via ${walletType} on ${new Date().toISOString()}`;
-      const signature = await newWeb3.eth.personal.sign(message, account, "");
 
-      alert(
-        `Connected to ${walletType}!\nAddress: ${account}\nBalance: ${balanceInEth} ETH\nSigned Message: ${message}\nSignature: ${signature}`
-      );
 
-      console.log("Signed Message:", message);
-      console.log("Signature:", signature);
-      console.log("Address:", account);
+  const connectToEthereumWallet = async (walletType) => {
 
-      return { success: true, walletInfo, walletType };
-    } catch (error) {
-      console.error(`Error connecting to ${walletType}:`, error);
-      let errorMessage = `Failed to connect to ${walletType}. Please try again.`;
-      if (error.code === 4001) {
-        errorMessage = `Connection rejected by user in ${walletType}.`;
-      } else if (error.code === -32002) {
-        errorMessage = `Request already pending in ${walletType}. Please check your wallet.`;
-      }
-      alert(errorMessage);
-      return { success: false };
-    } finally {
-      setIsConnecting(false);
-    }
-  };
+    try {
 
-  const connectToCOTI = async () => {
-    try {
-      setIsConnecting(true);
-      alert("Connecting to COTI wallet... (Placeholder implementation)");
-      
-      const walletInfo = {
-        address: "coti1exampleaddress1234567890abcdef",
-        balance: "100 COTI",
-      };
+      setIsConnecting(true);
 
-      setWalletData(walletInfo);
 
-      alert(`Connected to COTI!\nAddress: ${walletInfo.address}\nBalance: ${walletInfo.balance}`);
-      return { success: true, walletInfo, walletType: "COTI" };
-    } catch (error) {
-      console.error("Error connecting to COTI:", error);
-      alert("Failed to connect to COTI. Please try again.");
-      return { success: false };
-    } finally {
-      setIsConnecting(false);
-    }
-  };
 
-  const connectViaWalletConnect = async () => {
-    try {
-      setIsConnecting(true);
-      alert("WalletConnect is disabled for this test as no projectId is provided. Please use MetaMask or Trust Wallet.");
-      return { success: false };
-    } catch (error) {
-      console.error("Error connecting via WalletConnect:", error);
-      alert("Failed to connect via WalletConnect. Please try again.");
-      return { success: false };
-    } finally {
-      setIsConnecting(false);
-    }
-  };
+      if (!window.ethereum) {
 
-  const connectToOtherWallet = async (walletName) => {
-    try {
-      setIsConnecting(true);
-      alert(`${walletName} connection not implemented yet. Please use MetaMask, Trust Wallet, or COTI (placeholder) for this test.`);
-      return { success: false };
-    } catch (error) {
-      console.error(`Error connecting to ${walletName}:`, error);
-      alert(`Failed to connect to ${walletName}. Please try again.`);
-      return { success: false };
-    } finally {
-      setIsConnecting(false);
-    }
-  };
+        alert(`Please install ${walletType} to continue!`);
 
-  const handleWalletSelect = (wallet) => {
-    if (wallet === "Other Wallets") {
-      setIsOtherWalletsOpen(!isOtherWalletsOpen);
-    } else {
-      setSelectedWallet(wallet);
-      setIsOtherWalletsOpen(false);
-    }
-  };
+        return { success: false };
 
-  const handleConnectWallet = async () => {
-    if (!selectedWallet) {
-      alert("Please select a wallet to connect.");
-      return;
-    }
+      }
 
-    let result = { success: false, walletInfo: null, walletType: null };
-    if (selectedWallet === "MetaMask") {
-      result = await connectToEthereumWallet("MetaMask");
-    } else if (selectedWallet === "Trust Wallet") {
-      result = await connectToEthereumWallet("Trust Wallet");
-    } else if (selectedWallet === "COTI") {
-      result = await connectToCOTI();
-    } else if (selectedWallet === "WalletConnect") {
-      result = await connectViaWalletConnect();
-    } else {
-      result = await connectToOtherWallet(selectedWallet);
-    }
 
-    if (result.success) {
-      const { walletInfo, walletType } = result;
-      const storedWalletAddress = localStorage.getItem("walletAddress");
-      const storedWalletType = localStorage.getItem("walletType");
 
-      // Validate wallet against signup wallet
-      if (ENABLE_WALLET_VALIDATION && storedWalletAddress && storedWalletType) {
-        const isSameWalletType = storedWalletType === (walletType || selectedWallet);
-        const isSameAddress = walletInfo.address.toLowerCase() === storedWalletAddress.toLowerCase();
+      const isTrustWallet = walletType === "Trust Wallet" && window.ethereum.isTrust;
 
-        if (!isSameWalletType || !isSameAddress) {
-          alert("This wallet does not match the one used during signup. Please use the same wallet.");
-          handleDisconnect();
-          return;
-        }
-      }
+      console.log(`Connecting to ${walletType}${isTrustWallet ? " (Trust Wallet detected)" : ""}`);
 
-      // Store wallet info and navigate to plans
-      localStorage.setItem("walletAddress", walletInfo.address);
-      localStorage.setItem("walletType", walletType || selectedWallet);
-      navigate("/plans");
-    }
-  };
 
-  const handleDisconnect = async () => {
-    setWalletData({ address: null, balance: null });
-    setWeb3(null);
-    setSelectedWallet(null);
-    setIsOtherWalletsOpen(false);
-    localStorage.removeItem("walletAddress");
-    localStorage.removeItem("walletType");
-    alert("Disconnected from wallet.");
-  };
 
-  const handleCopyAddress = () => {
-    navigator.clipboard.writeText(walletData.address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+      const newWeb3 = new Web3(window.ethereum);
 
-  useEffect(() => {
-    if (!web3) return;
+      setWeb3(newWeb3);
 
-    const handleAccountsChanged = async (newAccounts) => {
-      if (newAccounts.length === 0) {
-        setWalletData({ address: null, balance: null });
-        setWeb3(null);
-        setSelectedWallet(null);
-        setIsOtherWalletsOpen(false);
-        alert("Disconnected from wallet.");
-        return;
-      }
 
-      const newAccount = newAccounts[0];
-      const newBalance = await web3.eth.getBalance(newAccount);
-      const newBalanceInEth = web3.utils.fromWei(newBalance, "ether");
-      setWalletData({
-        address: newAccount,
-        balance: `${newBalanceInEth} ETH`,
-      });
-      alert(`Account changed!\nAddress: ${newAccount}\nBalance: ${newBalanceInEth} ETH`);
-    };
 
-    const handleChainChanged = async () => {
-      if (!walletData.address) return;
-      const newBalance = await web3.eth.getBalance(walletData.address);
-      const newBalanceInEth = web3.utils.fromWei(newBalance, "ether");
-      setWalletData((prev) => ({
-        ...prev,
-        balance: `${newBalanceInEth} ETH`,
-      }));
-      alert(`Network changed! New balance: ${newBalanceInEth} ETH`);
-    };
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
 
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", handleAccountsChanged);
-      window.ethereum.on("chainChanged", handleChainChanged);
-    }
 
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-        window.ethereum.removeListener("chainChanged", handleChainChanged);
-      }
-    };
-  }, [web3, walletData.address]);
 
-  const truncateAddress = (address) => {
-    if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+      if (accounts.length === 0) {
 
-  const wallets = [
-    { name: "Backpack", icon: backpackLogo },
-    { name: "Exodus", icon: exodusLogo },
-    { name: "Fireblocks", icon: fireblocksLogo },
-    { name: "Jupiter", icon: jupiterLogo },
-    { name: "Phantom", icon: phantomLogo },
-    { name: "Coinbase", icon: coinbaseLogo },
-    { name: "Bifrost", icon: bifrostLogo },
-    { name: "WEMIX", icon: wemixLogo },
-    { name: "Bitcoin", icon: btcLogo },
-    { name: "Solflare", icon: softlareLogo },
-    { name: "Blackfort", icon: blackfortLogo },
-  ];
+        alert(`No accounts found. Please connect an account in ${walletType}.`);
 
-  const filteredWallets = wallets.filter((wallet) =>
-    wallet.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+        return { success: false };
 
-  return (
-    <div className="welcome-container">
-      <Assets />
-      <div className="welcome-left">
-        <div className="welcome-left-content">
-          <h1>Welcome to Crypto Inheritance Protocol.</h1>
-          <p>Let's get you started on securing your legacy!</p>
-        </div>
-      </div>
-      <div className="welcome-right">
-        <div className="welcome-right-content">
-          <div className="logo">
-            <img src={cipLogo} alt="CIP Logo" className="logo-image" />
-          </div>
-          <div className="progress-indicator">
-            <span className="progress-step active">1</span>
-            <span className="progress-line"></span>
-            <span className="progress-step active">2</span>
-            <span className="progress-line"></span>
-            <span className="progress-step active">3</span>
-          </div>
-          <div className="connect-wallet-section">
-            <div className="signup-header">
-              <h3>Connect Wallet</h3>
-              <p>Connect a valid wallet to get started</p>
-            </div>
-            {walletData.address ? (
-              <div className="wallet-info">
-                <p>
-                  <strong>Wallet Address:</strong>{" "}
-                  <span className="wallet-address">{truncateAddress(walletData.address)}</span>
-                  <button className="copy-button" onClick={handleCopyAddress}>
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
-                </p>
-                <p><strong>Balance:</strong> {walletData.balance}</p>
-                <button className="disconnect-button" onClick={handleDisconnect}>
-                  Disconnect
-                </button>
-              </div>
-            ) : (
-              <div className="wallet-options">
-                <button
-                  className={`wallet-option ${selectedWallet === "COTI" ? "selected" : ""}`}
-                  onClick={() => handleWalletSelect("COTI")}
-                >
-                  <img src={cotiLogo} alt="COTI" className="wallet-icon" />
-                  COTI
-                  <span className={selectedWallet === "COTI" ? "selected-indicator" : "unselected-indicator"}></span>
-                </button>
-                <button
-                  className={`wallet-option ${selectedWallet === "MetaMask" ? "selected" : ""}`}
-                  onClick={() => handleWalletSelect("MetaMask")}
-                >
-                  <img src={metamask} alt="MetaMask" className="wallet-icon" />
-                  MetaMask
-                  <span className={selectedWallet === "MetaMask" ? "selected-indicator" : "unselected-indicator"}></span>
-                </button>
-                <button
-                  className={`wallet-option ${selectedWallet === "Trust Wallet" ? "selected" : ""}`}
-                  onClick={() => handleWalletSelect("Trust Wallet")}
-                >
-                  <img src={trustwallet} alt="Trust Wallet" className="wallet-icon" />
-                  Trust Wallet
-                  <span className={selectedWallet === "Trust Wallet" ? "selected-indicator" : "unselected-indicator"}></span>
-                </button>
-                <button
-                  className="wallet-option"
-                  onClick={() => handleWalletSelect("Other Wallets")}
-                >
-                  Other Wallets
-                  <img
-                    src={others}
-                    alt="Dropdown Arrow"
-                    className={`dropdown-arrow ${isOtherWalletsOpen ? "open" : ""}`}
-                  />
-                </button>
-                {isOtherWalletsOpen && (
-                  <div className="dropdown-options">
-                    <div className="dropdown-header">
-                      <h4>ALL WALLETS</h4>
-                      <button
-                        className="close-button"
-                        onClick={() => setIsOtherWalletsOpen(false)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <div className="search-bar">
-                      <input
-                        type="text"
-                        placeholder="Search wallet"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                      <span className="search-icon">🔍</span>
-                    </div>
-                    <div className="wallet-grid">
-                      {filteredWallets.map((wallet) => (
-                        <button
-                          key={wallet.name}
-                          className={`wallet-grid-item ${selectedWallet === wallet.name ? "selected" : ""}`}
-                          onClick={() => handleWalletSelect(wallet.name)}
-                        >
-                          <img
-                            src={wallet.icon}
-                            alt={wallet.name}
-                            className="wallet-icon"
-                          />
-                          <span>{wallet.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <button
-                  className="connect-wallet-button"
-                  onClick={handleConnectWallet}
-                  disabled={isConnecting}
-                >
-                  {isConnecting ? "Connecting..." : "Connect Wallet"}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+      }
+
+
+
+      const account = accounts[0];
+
+      const balance = await newWeb3.eth.getBalance(account);
+
+      const balanceInEth = newWeb3.utils.fromWei(balance, "ether");
+
+
+
+      const walletInfo = {
+
+        address: account,
+
+        balance: `${balanceInEth} ETH`,
+
+      };
+
+
+
+      setWalletData(walletInfo);
+
+
+
+      const message = `Connecting wallet to Crypto Inheritance Protocol via ${walletType} on ${new Date().toISOString()}`;
+
+      const signature = await newWeb3.eth.personal.sign(message, account, "");
+
+
+
+      alert(
+
+        `Connected to ${walletType}!\nAddress: ${account}\nBalance: ${balanceInEth} ETH\nSigned Message: ${message}\nSignature: ${signature}`
+
+      );
+
+
+
+      console.log("Signed Message:", message);
+
+      console.log("Signature:", signature);
+
+      console.log("Address:", account);
+
+
+
+      return { success: true, walletInfo, walletType };
+
+    } catch (error) {
+
+      console.error(`Error connecting to ${walletType}:`, error);
+
+      alert(`Failed to connect to ${walletType}. Please try again.`);
+
+      return { success: false };
+
+    } finally {
+
+      setIsConnecting(false);
+
+    }
+
+  };
+
+
+
+  const connectToCOTI = async () => {
+
+    try {
+
+      setIsConnecting(true);
+
+      alert("Connecting to COTI wallet... (Placeholder implementation)");
+
+      
+
+      const walletInfo = {
+
+        address: "coti1exampleaddress1234567890abcdef",
+
+        balance: "100 COTI",
+
+      };
+
+
+
+      setWalletData(walletInfo);
+
+
+
+      alert(`Connected to COTI!\nAddress: ${walletInfo.address}\nBalance: ${walletInfo.balance}`);
+
+      return { success: true, walletInfo, walletType: "COTI" };
+
+    } catch (error) {
+
+      console.error("Error connecting to COTI:", error);
+
+      alert("Failed to connect to COTI. Please try again.");
+
+      return { success: false };
+
+    } finally {
+
+      setIsConnecting(false);
+
+    }
+
+  };
+
+
+
+  const connectViaWalletConnect = async () => {
+
+    try {
+
+      setIsConnecting(true);
+
+      alert("WalletConnect is disabled for this test as no projectId is provided. Please use MetaMask or Trust Wallet.");
+
+      return { success: false };
+
+    } catch (error) {
+
+      console.error("Error connecting via WalletConnect:", error);
+
+      alert("Failed to connect via WalletConnect. Please try again.");
+
+      return { success: false };
+
+    } finally {
+
+      setIsConnecting(false);
+
+    }
+
+  };
+
+
+
+  const connectToOtherWallet = async (walletName) => {
+
+    try {
+
+      setIsConnecting(true);
+
+      alert(`${walletName} connection not implemented yet. Please use MetaMask, Trust Wallet, or COTI (placeholder) for this test.`);
+
+      return { success: false };
+
+    } catch (error) {
+
+      console.error(`Error connecting to ${walletName}:`, error);
+
+      alert(`Failed to connect to ${walletName}. Please try again.`);
+
+      return { success: false };
+
+    } finally {
+
+      setIsConnecting(false);
+
+    }
+
+  };
+
+
+
+  const handleWalletSelect = (wallet) => {
+
+    if (wallet === "Other Wallets") {
+
+      setIsOtherWalletsOpen(!isOtherWalletsOpen);
+
+    } else {
+
+      setSelectedWallet(wallet);
+
+      setIsOtherWalletsOpen(false);
+
+    }
+
+  };
+
+
+
+  const handleConnectWallet = async () => {
+
+    if (!selectedWallet) {
+
+      alert("Please select a wallet to connect.");
+
+      return;
+
+    }
+
+
+
+    let result = { success: false, walletInfo: null, walletType: null };
+
+    if (selectedWallet === "MetaMask") {
+
+      result = await connectToEthereumWallet("MetaMask");
+
+    } else if (selectedWallet === "Trust Wallet") {
+
+      result = await connectToEthereumWallet("Trust Wallet");
+
+    } else if (selectedWallet === "COTI") {
+
+      result = await connectToCOTI();
+
+    } else if (selectedWallet === "WalletConnect") {
+
+      result = await connectViaWalletConnect();
+
+    } else {
+
+      result = await connectToOtherWallet(selectedWallet);
+
+    }
+
+
+
+    if (result.success) {
+
+      const { walletInfo, walletType } = result;
+
+      const storedWalletAddress = localStorage.getItem("walletAddress");
+
+      const storedWalletType = localStorage.getItem("walletType");
+
+
+
+      // Validate wallet against signup wallet
+
+      if (ENABLE_WALLET_VALIDATION && storedWalletAddress && storedWalletType) {
+
+        const isSameWalletType = storedWalletType === (walletType || selectedWallet);
+
+        const isSameAddress = walletInfo.address.toLowerCase() === storedWalletAddress.toLowerCase();
+
+
+
+        if (!isSameWalletType || !isSameAddress) {
+
+          alert("This wallet does not match the one used during signup. Please use the same wallet.");
+
+          handleDisconnect();
+
+          return;
+
+        }
+
+      }
+
+
+
+      // Store wallet info and navigate to plans
+
+      localStorage.setItem("walletAddress", walletInfo.address);
+
+      localStorage.setItem("walletType", walletType || selectedWallet);
+
+      navigate("/plans");
+
+    }
+
+  };
+
+
+
+  const handleDisconnect = async () => {
+
+    setWalletData({ address: null, balance: null });
+
+    setWeb3(null);
+
+    setSelectedWallet(null);
+
+    setIsOtherWalletsOpen(false);
+
+    localStorage.removeItem("walletAddress");
+
+    localStorage.removeItem("walletType");
+
+    alert("Disconnected from wallet.");
+
+  };
+
+
+
+  const handleCopyAddress = () => {
+
+    navigator.clipboard.writeText(walletData.address);
+
+    setCopied(true);
+
+    setTimeout(() => setCopied(false), 2000);
+
+  };
+
+
+
+  useEffect(() => {
+
+    if (!web3) return;
+
+
+
+    const handleAccountsChanged = async (newAccounts) => {
+
+      if (newAccounts.length === 0) {
+
+        setWalletData({ address: null, balance: null });
+
+        setWeb3(null);
+
+        setSelectedWallet(null);
+
+        setIsOtherWalletsOpen(false);
+
+        alert("Disconnected from wallet.");
+
+        return;
+
+      }
+
+
+
+      const newAccount = newAccounts[0];
+
+      const newBalance = await web3.eth.getBalance(newAccount);
+
+      const newBalanceInEth = web3.utils.fromWei(newBalance, "ether");
+
+      setWalletData({
+
+        address: newAccount,
+
+        balance: `${newBalanceInEth} ETH`,
+
+      });
+
+      alert(`Account changed!\nAddress: ${newAccount}\nBalance: ${newBalanceInEth} ETH`);
+
+    };
+
+
+
+    const handleChainChanged = async () => {
+
+      if (!walletData.address) return;
+
+      const newBalance = await web3.eth.getBalance(walletData.address);
+
+      const newBalanceInEth = web3.utils.fromWei(newBalance, "ether");
+
+      setWalletData((prev) => ({
+
+        ...prev,
+
+        balance: `${newBalanceInEth} ETH`,
+
+      }));
+
+      alert(`Network changed! New balance: ${newBalanceInEth} ETH`);
+
+    };
+
+
+
+    if (window.ethereum) {
+
+      window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+      window.ethereum.on("chainChanged", handleChainChanged);
+
+    }
+
+
+
+    return () => {
+
+      if (window.ethereum) {
+
+        window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+
+        window.ethereum.removeListener("chainChanged", handleChainChanged);
+
+      }
+
+    };
+
+  }, [web3, walletData.address]);
+
+
+
+  const truncateAddress = (address) => {
+
+    if (!address) return "";
+
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+  };
+
+
+
+  const wallets = [
+
+    { name: "Backpack", icon: backpackLogo},
+
+    { name: "Exodus", icon: exodusLogo},
+
+    { name: "Fireblocks", icon: fireblocksLogo},
+
+    { name: "Jupiter", icon: jupiterLogo },
+
+    { name: "Phantom", icon: phantomLogo },
+
+    { name: "Coinbase", icon: coinbaseLogo },
+
+    { name: "Bifrost", icon: bifrostLogo },
+
+    { name: "WEMIX", icon: wemixLogo},
+
+    { name: "Bitcoin", icon: btcLogo },
+
+    { name: "Solflare", icon: softlareLogo },
+
+    { name: "Blackfort", icon: blackfortLogo },
+
+  ];
+
+
+
+  const filteredWallets = wallets.filter((wallet) =>
+
+    wallet.name.toLowerCase().includes(searchQuery.toLowerCase())
+
+  );
+
+
+
+  return (
+
+    <div className="welcome-container">
+
+      <Assets />
+
+      <div className="welcome-left">
+
+        <div className="welcome-left-content">
+
+          <h1>Welcome to Crypto Inheritance Protocol.</h1>
+
+          <p>Let's get you started on securing your legacy!</p>
+
+        </div>
+
+      </div>
+
+      <div className="welcome-right">
+
+        <div className="welcome-right-content">
+
+          <div className="logo">
+
+            <img src={cipLogo} alt="CIP Logo" className="logo-image" />
+
+          </div>
+
+          <div className="progress-indicator">
+
+            <span className="progress-step active">1</span>
+
+            <span className="progress-line"></span>
+
+            <span className="progress-step active">2</span>
+
+            <span className="progress-line"></span>
+
+            <span className="progress-step active">3</span>
+
+          </div>
+
+          <div className="connect-wallet-section">
+
+            <div className="signup-header">
+
+              <h3>Connect Wallet</h3>
+
+              <p>Connect a valid wallet to get started</p>
+
+            </div>
+
+            {walletData.address ? (
+
+              <div className="wallet-info">
+
+                <p>
+
+                  <strong>Wallet Address:</strong>{" "}
+
+                  <span className="wallet-address">{truncateAddress(walletData.address)}</span>
+
+                  <button className="copy-button" onClick={handleCopyAddress}>
+
+                    {copied ? "Copied!" : "Copy"}
+
+                  </button>
+
+                </p>
+
+                <p><strong>Balance:</strong> {walletData.balance}</p>
+
+                <button className="disconnect-button" onClick={handleDisconnect}>
+
+                  Disconnect
+
+                </button>
+
+              </div>
+
+            ) : (
+
+              <div className="wallet-options">
+
+                <button
+
+                  className={`wallet-option ${selectedWallet === "COTI" ? "selected" : ""}`}
+
+                  onClick={() => handleWalletSelect("COTI")}
+
+                >
+
+                  <img src={cotiLogo} alt="COTI" className="wallet-icon" />
+
+                  COTI
+
+                  <span className={selectedWallet === "COTI" ? "selected-indicator" : "unselected-indicator"}></span>
+
+                </button>
+
+                <button
+
+                  className={`wallet-option ${selectedWallet === "MetaMask" ? "selected" : ""}`}
+
+                  onClick={() => handleWalletSelect("MetaMask")}
+
+                >
+
+                  <img src={metamask} alt="MetaMask" className="wallet-icon" />
+
+                  MetaMask
+
+                  <span className={selectedWallet === "MetaMask" ? "selected-indicator" : "unselected-indicator"}></span>
+
+                </button>
+
+                <button
+
+                  className={`wallet-option ${selectedWallet === "Trust Wallet" ? "selected" : ""}`}
+
+                  onClick={() => handleWalletSelect("Trust Wallet")}
+
+                >
+
+                  <img src={trustwallet} alt="Trust Wallet" className="wallet-icon" />
+
+                  Trust Wallet
+
+                  <span className={selectedWallet === "Trust Wallet" ? "selected-indicator" : "unselected-indicator"}></span>
+
+                </button>
+
+                <button
+
+                  className="wallet-option"
+
+                  onClick={() => handleWalletSelect("Other Wallets")}
+
+                >
+
+                  Other Wallets
+
+                  <img
+
+                    src={others}
+
+                    alt="Dropdown Arrow"
+
+                    className={`dropdown-arrow ${isOtherWalletsOpen ? "open" : ""}`}
+
+                  />
+
+                </button>
+
+                {isOtherWalletsOpen && (
+
+                  <div className="dropdown-options">
+
+                    <div className="dropdown-header">
+
+                      <h4>ALL WALLETS</h4>
+
+                      <button
+
+                        className="close-button"
+
+                        onClick={() => setIsOtherWalletsOpen(false)}
+
+                      >
+
+                        ×
+
+                      </button>
+
+                    </div>
+
+                    <div className="search-bar">
+
+                      <input
+
+                        type="text"
+
+                        placeholder="Search wallet"
+
+                        value={searchQuery}
+
+                        onChange={(e) => setSearchQuery(e.target.value)}
+
+                      />
+
+                      <span className="search-icon">🔍</span>
+
+                    </div>
+
+                    <div className="wallet-grid">
+
+                      {filteredWallets.map((wallet) => (
+
+                        <button
+
+                          key={wallet.name}
+
+                          className={`wallet-grid-item ${selectedWallet === wallet.name ? "selected" : ""}`}
+
+                          onClick={() => handleWalletSelect(wallet.name)}
+
+                        >
+
+                          <img
+
+                            src={wallet.icon}
+
+                            alt={wallet.name}
+
+                            className="wallet-icon"
+
+                          />
+
+                          <span>{wallet.name}</span>
+
+                        </button>
+
+                      ))}
+
+                    </div>
+
+                  </div>
+
+                )}
+
+                <button
+
+                  className="connect-wallet-button"
+
+                  onClick={handleConnectWallet}
+
+                  disabled={isConnecting}
+
+                >
+
+                  {isConnecting ? "Connecting..." : "Connect Wallet"}
+
+                </button>
+
+              </div>
+
+            )}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
 }
+
+
 
 export default ConnectWallet;
