@@ -6,11 +6,9 @@ import "../index.css";
 import images from '../assets/images';
 
 const { walletLogos, uiIcons } = images;
-const {cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, phantomLogo, btcLogo,backpackLogo,
+const { cipLogo, metamask, trustwallet, exodusLogo, fireblocksLogo, jupiterLogo, phantomLogo, btcLogo, backpackLogo,
   cotiLogo, coinbaseLogo, bifrostLogo, wemixLogo, softlareLogo, blackfortLogo } = walletLogos;
-
 const { others } = uiIcons;
-
 
 // Enable wallet validation
 const ENABLE_WALLET_VALIDATION = true;
@@ -23,7 +21,7 @@ function ConnectWallet() {
   const [web3, setWeb3] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState("COTI"); // Corrected line
+  const [selectedWallet, setSelectedWallet] = useState("COTI");
   const [isOtherWalletsOpen, setIsOtherWalletsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
@@ -31,32 +29,51 @@ function ConnectWallet() {
   const connectToEthereumWallet = async (walletType) => {
     try {
       setIsConnecting(true);
-      console.log("Connecting to:", walletType); // Debugging log
 
+      // Check if MetaMask (or compatible wallet) is installed
       if (!window.ethereum) {
-        console.log("window.ethereum is not available"); // Debugging log
-        alert(`Please install ${walletType} to continue!`);
+        alert(`Please install ${walletType} or a compatible Ethereum wallet to continue!`);
         return { success: false };
       }
 
-      console.log("window.ethereum is available:", window.ethereum); // Debugging log
+      // Detect if the wallet is MetaMask or a compatible wallet
+      const isMetaMask = window.ethereum.isMetaMask;
+      console.log(`Connecting to ${walletType}${isMetaMask ? " (MetaMask detected)" : ""}`);
 
-      const isTrustWallet = walletType === "Trust Wallet" && window.ethereum.isTrust;
-      console.log(`Connecting to ${walletType}${isTrustWallet ? " (Trust Wallet detected)" : ""}`); // Debugging log
-
+      // Initialize Web3 with the provider
       const newWeb3 = new Web3(window.ethereum);
       setWeb3(newWeb3);
-      console.log("Web3 instance created:", newWeb3); // Debugging log
 
+      // Request account access
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      console.log("Accounts retrieved:", accounts); // Debugging log
 
-      if (!accounts || accounts.length === 0) {
+      if (accounts.length === 0) {
         alert(`No accounts found. Please connect an account in ${walletType}.`);
         return { success: false };
       }
 
       const account = accounts[0];
+
+      // Ensure the wallet is connected to the Ethereum mainnet (chainId: 1) or a compatible network
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
+      if (chainId !== "0x1") { // Ethereum Mainnet
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x1" }],
+          });
+        } catch (switchError) {
+          // If the chain is not added, prompt the user to add it
+          if (switchError.code === 4902) {
+            alert("Please add the Ethereum Mainnet in your wallet.");
+          } else {
+            alert("Please switch to the Ethereum Mainnet in your wallet.");
+          }
+          return { success: false };
+        }
+      }
+
+      // Get balance
       const balance = await newWeb3.eth.getBalance(account);
       const balanceInEth = newWeb3.utils.fromWei(balance, "ether");
 
@@ -66,8 +83,8 @@ function ConnectWallet() {
       };
 
       setWalletData(walletInfo);
-      console.log("Wallet data set:", walletInfo); // Debugging log
 
+      // Sign a message to verify wallet ownership
       const message = `Connecting wallet to Crypto Inheritance Protocol via ${walletType} on ${new Date().toISOString()}`;
       const signature = await newWeb3.eth.personal.sign(message, account, "");
 
@@ -75,18 +92,23 @@ function ConnectWallet() {
         `Connected to ${walletType}!\nAddress: ${account}\nBalance: ${balanceInEth} ETH\nSigned Message: ${message}\nSignature: ${signature}`
       );
 
-      console.log("Signed Message:", message); // Debugging log
-      console.log("Signature:", signature); // Debugging log
-      console.log("Address:", account); // Debugging log
+      console.log("Signed Message:", message);
+      console.log("Signature:", signature);
+      console.log("Address:", account);
 
       return { success: true, walletInfo, walletType };
     } catch (error) {
       console.error(`Error connecting to ${walletType}:`, error);
-      alert(`Failed to connect to ${walletType}. Please try again.`);
+      let errorMessage = `Failed to connect to ${walletType}. Please try again.`;
+      if (error.code === 4001) {
+        errorMessage = `Connection rejected by user in ${walletType}.`;
+      } else if (error.code === -32002) {
+        errorMessage = `Request already pending in ${walletType}. Please check your wallet.`;
+      }
+      alert(errorMessage);
       return { success: false };
     } finally {
       setIsConnecting(false);
-      console.log("Connection attempt finished."); // Debugging log
     }
   };
 
@@ -94,7 +116,7 @@ function ConnectWallet() {
     try {
       setIsConnecting(true);
       alert("Connecting to COTI wallet... (Placeholder implementation)");
-
+      
       const walletInfo = {
         address: "coti1exampleaddress1234567890abcdef",
         balance: "100 COTI",
@@ -262,14 +284,14 @@ function ConnectWallet() {
   };
 
   const wallets = [
-    { name: "Backpack", icon: backpackLogo},
-    { name: "Exodus", icon: exodusLogo},
-    { name: "Fireblocks", icon: fireblocksLogo},
+    { name: "Backpack", icon: backpackLogo },
+    { name: "Exodus", icon: exodusLogo },
+    { name: "Fireblocks", icon: fireblocksLogo },
     { name: "Jupiter", icon: jupiterLogo },
     { name: "Phantom", icon: phantomLogo },
     { name: "Coinbase", icon: coinbaseLogo },
     { name: "Bifrost", icon: bifrostLogo },
-    { name: "WEMIX", icon: wemixLogo},
+    { name: "WEMIX", icon: wemixLogo },
     { name: "Bitcoin", icon: btcLogo },
     { name: "Solflare", icon: softlareLogo },
     { name: "Blackfort", icon: blackfortLogo },
