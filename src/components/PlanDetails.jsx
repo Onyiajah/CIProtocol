@@ -1,78 +1,76 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Assets from "./Assets"; // Import Assets
-import "../index.css";
-import images from '../assets/images';  
+import Assets from "./Assets";
+import { getWill, fundWill, initializeWeb3 } from "../utils/ContractInteraction.js";
+import images from '../assets/images';
 
 const { walletLogos, uiIcons } = images;
-const {cipLogo} = walletLogos;
-
-const {profile} = uiIcons;
+const { cipLogo } = walletLogos;
+const { profile } = uiIcons;
 
 function PlanDetails() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { plan, planName } = location.state || {};
+  const { plan, planName, willer, transactionHash } = location.state || {};
+  const [willDetails, setWillDetails] = useState(null);
+  const [funding, setFunding] = useState(false);
+  const [fundError, setFundError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleDeletePlan = () => {
-    // Retrieve existing plans from local storage
-    const existingPlans = JSON.parse(localStorage.getItem("plans")) || [];
-    
-    // Filter out the current plan (compare by asset, beneficiaries, and trigger conditions)
-    const updatedPlans = existingPlans.filter(
-      (p) =>
-        p.asset !== plan.asset ||
-        p.beneficiaries.length !== plan.beneficiaries.length ||
-        p.triggerConditions !== plan.triggerConditions
-    );
+  useEffect(() => {
+    const fetchWillDetails = async () => {
+      if (!willer) return;
+      setLoading(true);
+      try {
+        await initializeWeb3();
+        const details = await getWill(willer);
+        setWillDetails(details);
+      } catch (error) {
+        console.error("Fetch will error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWillDetails();
+  }, [willer]);
 
-    // Save the updated plans back to local storage
-    localStorage.setItem("plans", JSON.stringify(updatedPlans));
-
-    // Navigate to PostAssetDashboard using the planName
-    navigate(`/post-asset/${planName || "Free"}`);
+  const handleFundWill = async () => {
+    if (!willer) return;
+    setFunding(true);
+    setFundError(null);
+    try {
+      await initializeWeb3();
+      const receipt = await fundWill();
+      console.log("Funded will:", receipt.transactionHash);
+      alert("Will funded successfully!");
+    } catch (error) {
+      setFundError(error.message || "Failed to fund will.");
+    } finally {
+      setFunding(false);
+    }
   };
 
   if (!plan) {
     return (
       <div className="dashboard-page">
+        {/* Same as original no-plan case */}
         <div className="sidebar">
-          <div className="logo">
-            <img src={cipLogo} alt="CIP Logo" className="logo-image" />
-          </div>
+          <div className="logo"><img src={cipLogo} alt="CIP Logo" className="logo-image" /></div>
           <div className="sidebar-nav">
-            <button
-              className="sidebar-button dashboard-button"
-              onClick={() => navigate(`/dashboard/${planName || "Free"}`)}
-            >
-              <span className="icon houseline-icon"></span>
-              Dashboard
-            </button>
-            <button
-              className="sidebar-button plans-button"
-              onClick={() => navigate("/plans")}
-            >
-              <span className="icon plans-icon"></span>
-              Plans
-            </button>
+            <button className="sidebar-button" onClick={() => navigate(`/dashboard/${planName || "Free"}`)}>Dashboard</button>
+            <button className="sidebar-button" onClick={() => navigate("/plans")}>Plans</button>
           </div>
         </div>
-
         <div className="main-content">
           <div className="dashboard-header">
             <h1 className="dashboard-title">Plan Details</h1>
             <div className="user-info">
               <span className="bell-icon"></span>
               <span className="user-greeting">Hello, Afolabi12345</span>
-              <img
-                src={profile}
-                alt="User Avatar"
-                className="user-avatar"
-              />
+              <img src={profile} alt="User Avatar" className="user-avatar" />
               <span className="dropdown-arrow"></span>
             </div>
           </div>
-
           <div className="no-assets-section">
             <p className="no-assets-text">No plan details available.</p>
           </div>
@@ -83,44 +81,24 @@ function PlanDetails() {
 
   return (
     <div className="dashboard-page">
-       <Assets /> {/* Preload all images */}
+      <Assets />
       <div className="sidebar">
-        <div className="logo">
-          <img src={cipLogo} alt="CIP Logo" className="logo-image" />
-        </div>
+        <div className="logo"><img src={cipLogo} alt="CIP Logo" className="logo-image" /></div>
         <div className="sidebar-nav">
-          <button
-            className="sidebar-button dashboard-button active"
-            onClick={() => navigate(`/post-asset/${planName || "Free"}`)}
-          >
-            <span className="icon houseline-icon"></span>
-            Dashboard
-          </button>
-          <button
-            className="sidebar-button plans-button"
-            onClick={() => navigate("/plans")}
-          >
-            <span className="icon plans-icon"></span>
-            Plans
-          </button>
+          <button className="sidebar-button active" onClick={() => navigate(`/post-asset/${planName || "Free"}`)}>Dashboard</button>
+          <button className="sidebar-button" onClick={() => navigate("/plans")}>Plans</button>
         </div>
       </div>
-
       <div className="main-content">
         <div className="dashboard-header">
-          <h1 className="dashboard-title">Dashboard</h1>
+          <h1 className="dashboard-title">Plan Details</h1>
           <div className="user-info">
             <span className="bell-icon"></span>
             <span className="user-greeting">Hello, Afolabi12345</span>
-            <img
-              src={profile}
-              alt="User Avatar"
-              className="user-avatar"
-            />
+            <img src={profile} alt="User Avatar" className="user-avatar" />
             <span className="dropdown-arrow"></span>
           </div>
         </div>
-
         <div className="review-plan-section">
           <h2 className="review-plan-heading">Plan Details</h2>
           <div className="review-item">
@@ -128,31 +106,36 @@ function PlanDetails() {
             <div className="review-item-content asset-content">
               <span className="asset-icon"></span>
               <span className="asset-name">{plan.asset}</span>
-            </div>
-          </div>
-
-          <div className="review-item">
-            <h3 className="review-item-title">Beneficiaries</h3>
-            <div className="review-item-content bordered-content">
-              {plan.beneficiaries && plan.beneficiaries.length > 0 ? (
-                plan.beneficiaries.map((beneficiary, index) => (
-                  <p key={index} className="beneficiary-address">
-                    {beneficiary.walletAddress || "N/A"}
-                  </p>
-                ))
-              ) : (
-                <p className="beneficiary-address">No beneficiaries added</p>
+              {loading && <span>Loading will details...</span>}
+              {willDetails && (
+                <div className="asset-details">
+                  <p>Exists: {willDetails.exists ? "Yes" : "No"}</p>
+                  <p>Distributed: {willDetails.distributed ? "Yes" : "No"}</p>
+                  <p>Release Time: {new Date(willDetails.releaseTime * 1000).toLocaleString()}</p>
+                  <h4>Inheritors:</h4>
+                  {willDetails.inheritorAddresses.map((addr, i) => (
+                    <p key={i}>{addr} - {willDetails.inheritorPercentages[i] / 100}%</p>
+                  ))}
+                </div>
               )}
             </div>
           </div>
-
+          <div className="review-item">
+            <h3 className="review-item-title">Beneficiaries</h3>
+            <div className="review-item-content bordered-content">
+              {plan.beneficiaries.map((beneficiary, index) => (
+                <p key={index} className="beneficiary-address">
+                  {beneficiary.wallet_address || "N/A"} - {beneficiary.share_percentage || "N/A"}%
+                </p>
+              ))}
+            </div>
+          </div>
           <div className="review-item">
             <h3 className="review-item-title">Trigger Conditions</h3>
             <div className="review-item-content bordered-content">
               <p className="trigger-conditions-text">{plan.triggerConditions}</p>
             </div>
           </div>
-
           <div className="confirm-button-wrapper">
             <button
               className="confirm-button"
@@ -162,11 +145,13 @@ function PlanDetails() {
             </button>
             <button
               className="confirm-button"
-              onClick={handleDeletePlan}
-              style={{ background: "#FF0000", marginLeft: "10px" }}
+              onClick={handleFundWill}
+              disabled={funding}
+              style={{ background: funding ? "#ccc" : "#28a745", marginLeft: "10px" }}
             >
-              Delete Plan
+              {funding ? "Funding..." : "Fund Will"}
             </button>
+            {fundError && <p style={{ color: "red" }}>{fundError}</p>}
           </div>
         </div>
       </div>
@@ -174,4 +159,4 @@ function PlanDetails() {
   );
 }
 
-export default PlanDetails; 
+export default PlanDetails;

@@ -144,6 +144,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<Login />} /> {/* Catch-all for 404 */}
       </Routes>
     </div>
   );

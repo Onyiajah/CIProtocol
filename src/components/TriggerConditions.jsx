@@ -1,15 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Assets from "./Assets"; // Import Assets
 import "../index.css";
-
-
 
 function TriggerConditions() {
   const navigate = useNavigate();
   const location = useLocation();
   const { asset, beneficiaries } = location.state || {}; // Receive asset and beneficiaries
   const [selectedTerm, setSelectedTerm] = useState(""); // State to track selected term
+  const [triggerTypes, setTriggerTypes] = useState([]); // State to store trigger types from API
+  const [error, setError] = useState(null); // State to handle errors
+
+  // Fetch trigger types from the API when the component mounts
+  useEffect(() => {
+    const fetchTriggerTypes = async () => {
+      try {
+        const response = await fetch("https://cip-6vcm.onrender.com/process/trigger-types");
+        if (!response.ok) {
+          throw new Error("Failed to fetch trigger types");
+        }
+        const data = await response.json();
+        setTriggerTypes(data); // Expecting ["inactivity", "due-date"]
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching trigger types:", err);
+      }
+    };
+
+    fetchTriggerTypes();
+  }, []); // Empty dependency array to run once on mount
 
   const handleTermChange = (event) => {
     setSelectedTerm(event.target.value);
@@ -21,11 +40,8 @@ function TriggerConditions() {
       return;
     }
     console.log("Navigating to:", selectedTerm); // Debug the intended navigation
-    // Navigate to the appropriate page based on the selected term, passing asset, beneficiaries, and term
+    // Navigate to the appropriate page based on the selected term
     switch (selectedTerm) {
-      case "multi-sig":
-        navigate("/multi-sig", { state: { asset, beneficiaries, term: selectedTerm } });
-        break;
       case "inactivity":
         navigate("/inactivity", { state: { asset, beneficiaries, term: selectedTerm } });
         break;
@@ -39,7 +55,7 @@ function TriggerConditions() {
 
   return (
     <div className="trigger-conditions-page">
-       <Assets /> {/* Preload all images */}
+      <Assets /> {/* Preload all images */}
       {/* Sidebar (Left Frame) - Same as Dashboard */}
       <div className="sidebar">
         <div className="logo">
@@ -98,6 +114,7 @@ function TriggerConditions() {
           <p className="trigger-conditions-subheading">
             Create conditions for your assets to be accessible.
           </p>
+          {error && <p className="error-message">Error: {error}</p>}
           <label className="terms-label">Select Your Terms</label>
           <select
             className="terms-dropdown"
@@ -107,9 +124,19 @@ function TriggerConditions() {
             <option value="" disabled>
               Select
             </option>
-            <option value="multi-sig">Multi-Sig</option>
-            <option value="inactivity">Inactivity</option>
-            <option value="due-date">Due Date</option>
+            {triggerTypes.length > 0 ? (
+              triggerTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type === "due-date"
+                    ? "Due Date"
+                    : type.charAt(0).toUpperCase() + type.slice(1)} {/* Format for display */}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                Loading trigger types...
+              </option>
+            )}
           </select>
           <div className="next-button-wrapper">
             <button className="next-button" onClick={handleNextClick}>
@@ -122,4 +149,4 @@ function TriggerConditions() {
   );
 }
 
-export default TriggerConditions; 
+export default TriggerConditions;

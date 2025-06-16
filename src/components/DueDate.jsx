@@ -1,23 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Assets from "./Assets"; // Import Assets
+import Assets from "./Assets";
 import "../index.css";
 
 function DueDate() {
   const navigate = useNavigate();
   const location = useLocation();
   const { asset, beneficiaries, term } = location.state || {};
-
   const [selectedTerm, setSelectedTerm] = useState(term || "due-date");
   const [dueDate, setDueDate] = useState("");
+  const [triggerTypes, setTriggerTypes] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTriggerTypes = async () => {
+      try {
+        const response = await fetch("https://cip-6vcm.onrender.com/process/trigger-types");
+        if (!response.ok) {
+          throw new Error("Failed to fetch trigger types");
+        }
+        const data = await response.json();
+        setTriggerTypes(data); // Expecting ["inactivity", "due-date"]
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching trigger types:", err);
+      }
+    };
+    fetchTriggerTypes();
+  }, []);
 
   const handleTermChange = (event) => {
     const newTerm = event.target.value;
     setSelectedTerm(newTerm);
     switch (newTerm) {
-      case "multi-sig":
-        navigate("/multi-sig", { state: { asset, beneficiaries, term: newTerm } });
-        break;
       case "inactivity":
         navigate("/inactivity", { state: { asset, beneficiaries, term: newTerm } });
         break;
@@ -37,8 +52,6 @@ function DueDate() {
       alert("Please select a due date before proceeding.");
       return;
     }
-
-    // Navigate to Review Plan, passing all data
     navigate("/review-plan", {
       state: {
         asset,
@@ -53,7 +66,7 @@ function DueDate() {
       <div className="due-date-page">
         <div className="sidebar">
           <div className="logo">
-            <img src="../assets/images/logo 1.png" alt="CIP Logo" className="logo-image" />
+            <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="sidebar-nav">
             <button
@@ -96,8 +109,7 @@ function DueDate() {
 
   return (
     <div className="due-date-page">
-       <Assets /> {/* Preload all images */}
-       {/* Sidebar (Left Frame) - Same as Dashboard */}
+      <Assets />
       <div className="sidebar">
         <div className="logo">
           <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
@@ -152,7 +164,7 @@ function DueDate() {
           <p className="due-date-subheading">
             Set a specific date for your assets to be accessible.
           </p>
-
+          {error && <p className="error-message">Error: {error}</p>}
           <label className="terms-label">Select Trigger Condition</label>
           <select
             className="terms-dropdown"
@@ -162,9 +174,19 @@ function DueDate() {
             <option value="" disabled>
               Select
             </option>
-            <option value="multi-sig">Multi-Sig</option>
-            <option value="inactivity">Inactivity</option>
-            <option value="due-date">Due Date</option>
+            {triggerTypes.length > 0 ? (
+              triggerTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type === "due-date"
+                    ? "Due Date"
+                    : type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                Loading trigger types...
+              </option>
+            )}
           </select>
 
           {selectedTerm === "due-date" && (
@@ -191,4 +213,4 @@ function DueDate() {
   );
 }
 
-export default DueDate; 
+export default DueDate;

@@ -1,5 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { DefinePlugin } = require("webpack");
+require("dotenv").config(); // Load .env file
 
 module.exports = {
   entry: "./src/index.jsx",
@@ -37,6 +39,11 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "./public/index.html",
+    }),
+    new DefinePlugin({
+      "process.env": {
+        REACT_APP_API_URL: JSON.stringify(process.env.REACT_APP_API_URL || "https://cip-6vcm.onrender.com/api"),
+      },
     }),
   ],
   resolve: {

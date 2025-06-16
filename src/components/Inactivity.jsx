@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Assets from "./Assets"; // Import Assets
+import Assets from "./Assets";
 import "../index.css";
 
 function Inactivity() {
   const navigate = useNavigate();
   const location = useLocation();
   const { asset, beneficiaries, term } = location.state || {};
-
   const [selectedTerm, setSelectedTerm] = useState(term || "inactivity");
   const [inactivityStartDate, setInactivityStartDate] = useState("");
+  const [triggerTypes, setTriggerTypes] = useState([]); // Store API trigger types
+  const [error, setError] = useState(null); // Handle API errors
+
+  // Fetch trigger types from the API
+  useEffect(() => {
+    const fetchTriggerTypes = async () => {
+      try {
+        const response = await fetch("https://cip-6vcm.onrender.com/process/trigger-types");
+        if (!response.ok) {
+          throw new Error("Failed to fetch trigger types");
+        }
+        const data = await response.json();
+        setTriggerTypes(data); // Expecting ["inactivity", "due-date"]
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching trigger types:", err);
+      }
+    };
+    fetchTriggerTypes();
+  }, []);
 
   const handleTermChange = (event) => {
     const newTerm = event.target.value;
     setSelectedTerm(newTerm);
     switch (newTerm) {
-      case "multi-sig":
-        navigate("/multi-sig", { state: { asset, beneficiaries, term: newTerm } });
-        break;
       case "inactivity":
         break;
       case "due-date":
@@ -37,8 +53,6 @@ function Inactivity() {
       alert("Please select a start date before proceeding.");
       return;
     }
-
-    // Navigate to Review Plan, passing all data
     navigate("/review-plan", {
       state: {
         asset,
@@ -53,7 +67,7 @@ function Inactivity() {
       <div className="inactivity-page">
         <div className="sidebar">
           <div className="logo">
-            <img src="/assets/logo-1.png" alt="CIP Logo" className="logo-image" />
+            <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
           </div>
           <div className="sidebar-nav">
             <button
@@ -96,8 +110,7 @@ function Inactivity() {
 
   return (
     <div className="inactivity-page">
-      <Assets /> {/* Preload all images */}
-      {/* Sidebar (Left Frame) - Same as Dashboard */}
+      <Assets />
       <div className="sidebar">
         <div className="logo">
           <img src="../assets/images/logo-1.png" alt="CIP Logo" className="logo-image" />
@@ -152,7 +165,7 @@ function Inactivity() {
           <p className="inactivity-subheading">
             Set an inactivity period for your assets to be accessible.
           </p>
-
+          {error && <p className="error-message">Error: {error}</p>}
           <label className="terms-label">Select Trigger Condition</label>
           <select
             className="terms-dropdown"
@@ -162,9 +175,19 @@ function Inactivity() {
             <option value="" disabled>
               Select
             </option>
-            <option value="multi-sig">Multi-Sig</option>
-            <option value="inactivity">Inactivity</option>
-            <option value="due-date">Due Date</option>
+            {triggerTypes.length > 0 ? (
+              triggerTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type === "due-date"
+                    ? "Due Date"
+                    : type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>
+                Loading trigger types...
+              </option>
+            )}
           </select>
 
           {selectedTerm === "inactivity" && (
